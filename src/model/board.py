@@ -2,7 +2,7 @@ from model.square import Square
 from enumeration import Color
 
 class Board:
-  contours: []
+  contours: list = None
   squares: list = None
 
   def colorBuild(self):

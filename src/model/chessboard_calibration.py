@@ -14,8 +14,12 @@ from utils import (
 from model.board import Board
 from model.debugable import Debugable
 from model.square import Square
+from enumeration import Color
 import numpy as np
 import imutils
+import json
+import os
+import sys
 
 class ChessboardCalibration(Debugable):
   """
@@ -31,6 +35,7 @@ class ChessboardCalibration(Debugable):
 
   __out_size: tuple = (500, 500)
   __padding_val: tuple = (15, 20)
+  __matrix: []
 
   def __init__(self, chessboard_img=None, debug=False):
     super().__init__(debug=debug)
@@ -72,14 +77,14 @@ class ChessboardCalibration(Debugable):
 
     # convert corners into a matrix of points
     if corners:
-      matrix = self.convertCorners2Matrix(corners)
-      self.board.squares = self.parseMatrix(matrix)
+      self.__matrix = self.convertCorners2Matrix(corners)
+      self.board.squares = self.parseMatrix(self.__matrix)
       self.board.colorBuild()
 
       # save only works when debug flag is True
       self.save(
         '5_mapping.jpg',
-        draw_chessboard_mapping(pa_image, matrix) if self.debug else None
+        draw_chessboard_mapping(pa_image, self.__matrix) if self.debug else None
       )
 
     return self.board
@@ -286,6 +291,9 @@ class ChessboardCalibration(Debugable):
     if img is None:
       raise Exception('img cannot be null')
 
+    if self.board.contours is None:
+      raise Exception('Cannot find a contours')
+
     img = self.cropImage(img, self.board.contours)
 
     if self.add_padding:
@@ -297,3 +305,78 @@ class ChessboardCalibration(Debugable):
       )
 
     return img
+
+  def __rootDir(self):
+    return os.path.join(os.path.dirname(sys.modules['__main__'].__file__), '../')
+
+  def saveMapping(self):
+    """
+    Save the chess board calibration mapping
+    """
+    if self.board.contours is None:
+      raise Exception('Cannot find a contours')
+
+    if self.board.squares is None:
+      raise Exception('Cannot find a squares')
+
+    if len(self.__matrix) == 0:
+      raise Exception('No 8x8 matrix found to save')
+
+    dictionary = {
+      "fix_rotate": self.fix_rotate,
+      "rotate_val": self.rotate_val,
+      "add_padding": self.add_padding,
+      "matrix": [
+        [(float(pt1), float(pt2)) for (pt1, pt2) in row]
+        for row in self.__matrix
+      ],
+      "board": {
+        "contours": self.board.contours.tolist(),
+        "squares": [
+          [s.toJson() for s in row ]
+          for row in self.board.squares
+        ]
+      }
+    }
+
+    # save mapping file
+    with open(os.path.join(self.__rootDir(), 'chessboard-mapping.json'), 'w') as f:
+      f.write('%s' % json.dumps(dictionary))
+
+  def loadMapping(self):
+    """
+    Load the chess board calibration mapping if exists.
+    """
+    chessboard_mapping_path = os.path.join(self.__rootDir(), 'chessboard-mapping.json')
+    if not os.path.exists(chessboard_mapping_path):
+      return (False, None)
+
+    json_str = None
+    with open(chessboard_mapping_path, 'r') as f:
+      json_str = f.read().strip()
+
+    # deserialize json object 
+    dictionary = json.loads(json_str)
+
+    self.fix_rotate = dictionary['fix_rotate']
+    self.rotate_val = dictionary['rotate_val']
+    self.add_padding = dictionary['add_padding']
+
+    self.__matrix = [
+      [
+        (np.float32(pt1), np.float32(pt2))
+        for (pt1, pt2) in row
+      ]
+      for row in dictionary['matrix']
+    ]
+
+    self.board = Board()
+    self.board.contours = np.array(dictionary['board']['contours'], dtype=object)
+    self.board.squares = []
+    for row in dictionary['board']['squares']:
+      for item in row:
+        square = Square(item["x1"], item["y1"], item["x2"], item["y2"])
+        square.color = Color(item["color"])
+        self.board.squares.append(square)
+
+    return (True, self.board)

@@ -45,3 +45,12 @@ class Square:
     if found:
       return Piece(class_name, acc)
     return None
+
+  def toJson(self):
+    return {
+      "color": self.color.value,
+      "x1": self.x1,
+      "y1": self.y1,
+      "x2": self.x2,
+      "y2": self.y2,
+    }
