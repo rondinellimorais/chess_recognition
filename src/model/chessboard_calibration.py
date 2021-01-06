@@ -372,11 +372,12 @@ class ChessboardCalibration(Debugable):
 
     self.board = Board()
     self.board.contours = np.array(dictionary['board']['contours'], dtype=object)
-    self.board.squares = []
-    for row in dictionary['board']['squares']:
-      for item in row:
-        square = Square(item["x1"], item["y1"], item["x2"], item["y2"])
-        square.color = Color(item["color"])
-        self.board.squares.append(square)
+    self.board.squares = [
+      [
+        Square(item["x1"], item["y1"], item["x2"], item["y2"], item["color"])
+        for item in row
+      ]
+      for row in dictionary['board']['squares']
+    ]
 
     return (True, self.board)
