@@ -37,19 +37,15 @@ class ChessboardCalibration(Debugable):
   __padding_val: tuple = (15, 20)
   __matrix: []
 
-  def __init__(self, chessboard_img=None, debug=False):
+  def __init__(self, debug=False):
     super().__init__(debug=debug)
     self.board = Board()
-    self.chessboard_img = chessboard_img
-
-    if self.chessboard_img is not None:
-      self.save('1_raw.jpg', self.chessboard_img)
-    else:
-      raise Exception('chess board image cannot be null')
   
-  def mapping(self, fix_rotate=False, rotate_val=-90, add_padding=False, apply_kdilate=True, smooth_ksize=(11, 11)):
+  def mapping(self, chessboard_img=None, fix_rotate=False, rotate_val=-90, add_padding=False, apply_kdilate=True, smooth_ksize=(11, 11)):
     """
     Make a chess board mapping to generate a 8x8 matrix.
+
+    @param chessboard_img A chess board image
 
     @param add_padding A boolean indicate if image need a padding. Default is `False`
 
@@ -61,11 +57,17 @@ class ChessboardCalibration(Debugable):
     
     @param smooth_ksize A tuple of Gaussian Blur ksize. Default is `(11, 11)`
     """
+    self.chessboard_img = chessboard_img
     self.add_padding = add_padding
     self.fix_rotate = fix_rotate
     self.rotate_val = rotate_val
     self.apply_kdilate = apply_kdilate
     self.smooth_ksize = smooth_ksize
+
+    if self.chessboard_img is not None:
+      self.save('1_raw.jpg', self.chessboard_img)
+    else:
+      raise Exception('chess board image cannot be null')
 
     # get chess board playable area. Playable area is a image of board and only the 64
     # squares clipping borders, backgrounds and something else that

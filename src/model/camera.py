@@ -52,7 +52,7 @@ class Camera:
 
         # capture the next frame
         frame = self.capture()
-        callback(frame)
+        callback(frame, self)
       
       # check to see if it's time to break
       if self.stop:
