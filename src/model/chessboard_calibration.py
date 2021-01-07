@@ -345,7 +345,7 @@ class ChessboardCalibration(Debugable):
     with open(os.path.join(self.__rootDir(), 'chessboard-mapping.json'), 'w') as f:
       f.write('%s' % json.dumps(dictionary))
 
-  def loadMapping(self):
+  def loadMapping(self) -> (bool, Board):
     """
     Load the chess board calibration mapping if exists.
     """
