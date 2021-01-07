@@ -116,5 +116,5 @@ Para isso eu tenho os TODO a seguir:
 3. Augmentation do dataset ✅
 4. Modificar o cfg conforme a sessão [How to improve object detection](https://github.com/AlexeyAB/darknet#how-to-improve-object-detection) ✅
 5. Treinar o modelo não menos do que `2000 * classes` iterations conforme a documentação pede
-6. Validar modelo ✅
+6. Validar modelo
 7. Em paralelo, devemos estudar um algoritmo que seja capaz de recortar o tabuleiro sem perder a informação da peça, se conseguirmos fazer isso devemos refazer o treino do modelo com esse novo dataset. ✅
