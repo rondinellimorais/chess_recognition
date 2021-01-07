@@ -28,6 +28,6 @@ class Board:
           piece:Piece = square.piece(img)
 
           if piece is not None:
-            print('[{}, {}] {} | {}'.format(r_idx, c_idx, piece.color, piece.name))
+            print('[{}, {}] {} | {} | {:.2f}%'.format(r_idx, c_idx, piece.color, piece.name, piece.acc))
           else:
             print('[{}, {}] Empty'.format(r_idx, c_idx))

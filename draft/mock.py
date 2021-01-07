@@ -1,17 +1,22 @@
 # mock
 from model import ChessboardCalibration
 import cv2
-from utils import imshow
-import os
+from utils import (
+  imshow,
+  imshow
+)
 
-frame = cv2.imread('/Volumes/ROND/chess/dataset/v2/resized/IMG_0357.jpg')
+chessboard_calibration = ChessboardCalibration(debug=True)
+board = chessboard_calibration.mapping(
+  chessboard_img=cv2.imread('/Volumes/ROND/chess/dataset/v2/resized/IMG_0365.jpg'),
+  smooth_ksize=(13, 13),
+  add_padding=True
+)
 
-chessboard_calibration = ChessboardCalibration(chessboard_img=frame)
-found, board = chessboard_calibration.loadMapping()
-if not found:
-  raise Exception('No mapping found. Run calibration mapping')
-
+frame = cv2.imread('/Volumes/ROND/chess/dataset/v2/resized/IMG_0408.jpg')
 img = chessboard_calibration.applyMapping(frame)
+
+board.state(img)
 
 # board.state(img)
 for (r_idx, row) in enumerate(board.squares):
