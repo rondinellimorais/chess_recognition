@@ -147,3 +147,22 @@ def draw_chessboard_mapping(img, matrix):
     return mapping_img
   else:
     return np.array([])
+
+def intersect_area(react1=None, react2=None):
+  """
+  Calcule area of intersect between two rectangles
+
+  @params
+  ---------
+    `react1` [x1, y1, x2, y1]
+    `react2` [x1, y1, x2, y1]
+
+  @return
+  ---------
+  None if rectangles don't intersect
+  """
+  dx = min(react1[2], react2[2]) - max(react1[0], react2[0])
+  dy = min(react1[3], react2[3]) - max(react1[1], react2[1])
+  if (dx>=0) and (dy>=0):
+    return dx*dy
+  return None

@@ -80,8 +80,7 @@ class ChessboardCalibration(Debugable):
     # convert corners into a matrix of points
     if corners:
       self.__matrix = self.convertCorners2Matrix(corners)
-      self.board.squares = self.parseMatrix(self.__matrix)
-      self.board.colorBuild()
+      self.board.addSquares(self.parseMatrix(self.__matrix))
 
       # save only works when debug flag is True
       self.save(
@@ -374,12 +373,12 @@ class ChessboardCalibration(Debugable):
 
     self.board = Board()
     self.board.contours = np.array(dictionary['board']['contours'], dtype=object)
-    self.board.squares = [
+    self.board.addSquares([
       [
         Square(item["x1"], item["y1"], item["x2"], item["y2"], item["color"])
         for item in row
       ]
       for row in dictionary['board']['squares']
-    ]
+    ])
 
     return (True, self.board)

@@ -100,7 +100,7 @@ class Darknet:
 
         detections.append((
           self.__labels[classIDs[i]],
-          (x, y, w, h),
+          (x, y, x+w, y+h),
           confidences[i]
         ))
     

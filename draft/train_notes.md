@@ -115,6 +115,20 @@ Para isso eu tenho os TODO a seguir:
 2. Mergear os dataset v2 e v3 ✅
 3. Augmentation do dataset ✅
 4. Modificar o cfg conforme a sessão [How to improve object detection](https://github.com/AlexeyAB/darknet#how-to-improve-object-detection) ✅
-5. Treinar o modelo não menos do que `2000 * classes` iterations conforme a documentação pede
-6. Validar modelo
+5. Treinar o modelo não menos do que `2000 * classes` iterations conforme a documentação pede ✅
+6. Validar modelo ✅
 7. Em paralelo, devemos estudar um algoritmo que seja capaz de recortar o tabuleiro sem perder a informação da peça, se conseguirmos fazer isso devemos refazer o treino do modelo com esse novo dataset. ✅
+
+## Test #9
+=====
+
+O modelo continua não indo bem mesmo após realizar o passos acima.
+
+Tivemos um insight hj pela manhã, vamos tentar fazer o seguinte:
+
+1. Treinar um novo modelo com novos calculos de âncoras (esperando limite de GPU)
+2. Treinar modelo sem pesos pre treinados (esperando limite de GPU)
+3. Insight para melhorar a precisão
+  - No mapeamento geramos uma imagem 500 x 500, verificar a possibilidade de gerar a imagem em 608 x 608 ✅
+  - Rodar o detector nessa imagem e medir o desempenho ✅
+  - Para o problema de crop da peça, tente detectar todos os objetos e então através das coordenadas da casa encontrar o ponto de intersecão com o bounding box da peça. ✅
