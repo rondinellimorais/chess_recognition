@@ -36,7 +36,7 @@ class Darknet:
     labels_path = 'assets/dnn/data.names'
     return open(labels_path).read().strip().split('\n')
 
-  def predict(self, img=None, size=(416, 416), thresh=0.35) -> tuple:
+  def predict(self, img=None, size=(416, 416), thresh=0.35, nms_threshold=0.6) -> list:
     """
     Deep neural network predict
     """
@@ -49,9 +49,15 @@ class Darknet:
     blob = blobFromImage(img, 1/255.0, size=size, swapRB=True, crop=False)
     self.__net.setInput(blob)
 
-    # initialize our lists of confidences and class IDs
+    # initialize our lists of detected bounding boxes, confidences, and
+    # class IDs, respectively
+    boxes = []
     confidences = []
     classIDs = []
+    detections = []
+
+    # grab input image dimensions
+    (H, W) = img.shape[:2]
 
     for output in self.__net.forward(self.__out_layers):
       for detection in output:
@@ -64,11 +70,38 @@ class Darknet:
         # filter out weak predictions by ensuring the detected
         # probability is greater than the minimum probability
         if confidence > thresh:
+          # scale the bounding box coordinates back relative to the
+          # size of the image, keeping in mind that YOLO actually
+          # returns the center (x, y)-coordinates of the bounding
+          # box followed by the boxes' width and height
+          box = detection[0:4] * np.array([W, H, W, H])
+          (centerX, centerY, width, height) = box.astype("int")
+
+          # use the center (x, y)-coordinates to derive the top and
+          # and left corner of the bounding box
+          x = int(centerX - (width / 2))
+          y = int(centerY - (height / 2))
+
+          # update our list of bounding box coordinates, confidences,
+          # and class IDs
+          boxes.append([x, y, int(width), int(height)])
           confidences.append(float(confidence))
           classIDs.append(classID)
+    
+    # apply non-maxima suppression to suppress weak, overlapping bounding
+    # boxes
+    idxs = cv2.dnn.NMSBoxes(boxes, confidences, thresh, nms_threshold)
 
-    if len(confidences) != 0:
-      max_conf_idx = np.argmax(confidences)
-      class_idx = classIDs[np.argmax(confidences)]
-      return (True, self.__labels[class_idx], confidences[max_conf_idx])
-    return (False, None, None)
+    if len(idxs) > 0:
+      for i in idxs.flatten():
+        # extract the bounding box coordinates
+        (x, y) = (boxes[i][0], boxes[i][1])
+        (w, h) = (boxes[i][2], boxes[i][3])
+
+        detections.append((
+          self.__labels[classIDs[i]],
+          (x, y, w, h),
+          confidences[i]
+        ))
+    
+    return detections

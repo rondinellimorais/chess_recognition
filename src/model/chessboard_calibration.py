@@ -33,7 +33,7 @@ class ChessboardCalibration(Debugable):
   rotate_val: int
   smooth_ksize: tuple
 
-  __out_size: tuple = (500, 500)
+  __out_size: tuple = (608, 608)
   __padding_val: tuple = (15, 20)
   __matrix: []
 
