@@ -11,7 +11,7 @@ class Darknet:
 
   def __init__(self):
     config_path = 'assets/dnn/yolov4.custom.cfg'
-    weights_path = 'assets/dnn/yolov4_best.weights'
+    weights_path = 'assets/dnn/yolov4_best_v1.weights'
 
     # load model
     self.__net = readNetFromDarknet(config_path, weights_path)

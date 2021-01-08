@@ -41,7 +41,7 @@ class Square:
     y2 = self.y2
 
     cropped = frame[y1:y2, x1:x2]
-    found, class_name, acc = self.network.predict(img=cropped, size=(64, 64), thresh=0.90)
+    found, class_name, acc = self.network.predict(img=cropped, size=(64, 64), thresh=0.5)
 
     if found:
       return Piece(class_name, acc)
