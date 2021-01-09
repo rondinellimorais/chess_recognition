@@ -36,9 +36,21 @@ class Darknet:
     labels_path = 'assets/dnn/data.names'
     return open(labels_path).read().strip().split('\n')
 
-  def predict(self, img=None, size=(416, 416), thresh=0.35, nms_threshold=0.6) -> list:
+  def predict(self, img=None, size=(416, 416), thresh=0.35, nms_threshold=0.6, draw_and_save=False) -> list:
     """
     Deep neural network predict
+
+    Params
+    ---
+    `img` image file to running darknet prediction
+
+    `size` width and height of network size. Default is `416x416`
+    
+    `thresh` a threshold used in darknet. Default is `0.35`
+    
+    `nms_threshold` a threshold used in non maximum suppression. Default is `0.6`
+    
+    `draw_and_save` a flag to debug predictions, when `True` the predictions is saved as a file. Default is `False`
     """
     if img is None:
       raise Exception('img cannot be null')
@@ -101,7 +113,39 @@ class Darknet:
         detections.append((
           self.__labels[classIDs[i]],
           (x, y, x+w, y+h),
-          confidences[i]
+          confidences[i],
+          classIDs[i]
         ))
     
+    # to debug
+    if draw_and_save and len(detections) > 0:
+      self.__save(img, detections)
+
     return detections
+
+  def __save(self, img, detections):
+    # initialize a list of colors to represent each possible class label
+    np.random.seed(42)
+    COLORS = np.random.randint(0, 255, size=(len(self.__labels), 3), dtype="uint8")
+
+    file_content = []
+    for (name, bounding_box, accuracy, class_id) in detections:
+      color = [int(c) for c in COLORS[class_id]]
+      x,y,w,h = bounding_box
+      cv2.rectangle(img, (x, y), (w, h), color, 2)
+      cv2.putText(img, str(class_id), (x + 5, y + 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+      file_content.append("{}\t| {}\t| {:.4f}".format(class_id, name, accuracy))
+  
+    # save prediction image
+    cv2.imwrite('debug/predictions.jpg', img)
+
+    # save prediction logs
+    names = list(map(lambda p: p[0], detections))
+    classes = list(dict.fromkeys(names))
+    metrics = list(map(lambda c: "{} | {}".format(str(names.count(c)), c), classes))
+    with open('debug/predictions.log', 'w') as txt_file:
+      txt_file.write('PREDICTIONS\n=================\n')
+      txt_file.write('\n'.join(file_content))
+      txt_file.write('\n\n\n')
+      txt_file.write('METRICS\n=================\n')
+      txt_file.write('\n'.join(metrics))
