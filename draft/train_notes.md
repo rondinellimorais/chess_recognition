@@ -126,9 +126,23 @@ O modelo continua não indo bem mesmo após realizar o passos acima.
 
 Tivemos um insight hj pela manhã, vamos tentar fazer o seguinte:
 
-1. Treinar um novo modelo com novos calculos de âncoras (esperando limite de GPU)
-2. Treinar modelo sem pesos pre treinados (esperando limite de GPU)
-3. Insight para melhorar a precisão
-  - No mapeamento geramos uma imagem 500 x 500, verificar a possibilidade de gerar a imagem em 608 x 608 ✅
-  - Rodar o detector nessa imagem e medir o desempenho ✅
-  - Para o problema de crop da peça, tente detectar todos os objetos e então através das coordenadas da casa encontrar o ponto de intersecão com o bounding box da peça. ✅
+[resultado]: fizemos um monte de coisa e nada funcionou.... :(
+
+## Test #10
+=====
+
+Estamos fazendo um curso no course de machile learning e esse curso nos deu alguns insights:
+
+1. Análise de Erro
+  Vamos obter métricas do nosso algoritmo.
+  Vamos analisar manualmente as imagens q estão errando e tentar identificar algum padrão.
+  Vamos medir se adicionando mais imagens reduz o erro (cross validation), se augumentation
+  reduz o erro etc.
+  Vamos verificar quantas anotações há para cada classe e se isso está influênciando no erro
+  Precisamos de mais imagens? Não sabemos vamos medir e verificar se sim.
+  Precisamos de mais features? Talvez imagens em preto e branco ou sei lá algum outro
+  tipo de imagem
+
+2. Uma das coisas que aprendi durante o curso é que independente do algoritmo, quem tem mais dados para treinar é o que se sai melhor.
+
+3. Um outro approuch seria utilizar o algoritmo treinado para gerar mais dados, ainda que o algoritmo faça uma detecção ruim podemos gerar o arquivo de anotação e no labelimg corrigir os bouding boxes que tiverem desempenho ruim. Com isso teríamos um aumento no dataset. 

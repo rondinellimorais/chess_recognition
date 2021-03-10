@@ -36,26 +36,20 @@ class Board:
 
   def state(self, img):
     # previews all image classes
-    detections = self.network.predict(img=img, size=(608, 608), thresh=0.8, draw_and_save=True)
+    detections = self.network.predict(img=img, size=(416, 416), thresh=0.8, draw_and_save=True)
 
     # check if the boxes intersect with any square
     for (name, bounding_box, accuracy, _) in detections:
+      old_area = 0
       for row in self.squares:
-        found = False
         for square in row:
-          if square.piece is None:
-            area = intersect_area(
-              np.array([square.x1, square.y1, square.x2, square.y2], dtype=object),
-              np.array(bounding_box, dtype=object)
-            )
+          area = intersect_area(
+            np.array([square.x1, square.y1, square.x2, square.y2], dtype=object),
+            np.array(bounding_box, dtype=object)
+          )
 
-            if area is not None:
-              square.createPiece(name, accuracy)
-              found = True
-              break # break the col loop
-
-        if found:
-          break # break the row loop
+          if area is not None and area > old_area:
+            square.createPiece(name, accuracy)
 
     return self.squares
 
