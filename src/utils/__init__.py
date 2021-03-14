@@ -3,6 +3,10 @@ import numpy as np
 import scipy.spatial as spatial
 import scipy.cluster as cluster
 from collections import defaultdict
+import os
+import fnmatch
+import re
+from glob import glob
 
 def imshow(name, frame, flags=cv2.WINDOW_AUTOSIZE):
   cv2.namedWindow(name, flags)
@@ -166,3 +170,10 @@ def intersect_area(react1=None, react2=None):
   if (dx>=0) and (dy>=0):
     return dx*dy
   return None
+
+def listdir(path, pattern):
+  """
+  List recursive files in dir with ignore case
+  """
+  regex = re.compile(fnmatch.translate(pattern), re.IGNORECASE)
+  return [os.path.abspath(name) for name in glob(path) if regex.match(name)]

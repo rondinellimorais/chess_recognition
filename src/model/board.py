@@ -36,7 +36,7 @@ class Board:
 
   def state(self, img):
     # previews all image classes
-    detections = self.network.predict(img=img, size=(416, 416), thresh=0.8, draw_and_save=True)
+    detections = self.network.predict(img=img, size=(608, 608), thresh=0.9, draw_and_save=True)
 
     # check if the boxes intersect with any square
     for (name, bounding_box, accuracy, _) in detections:

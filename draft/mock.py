@@ -21,3 +21,25 @@ if found:
   img = chessboard_calibration.applyMapping(frame)
   board.state(img)
   imshow('img', img)
+
+
+
+
+
+#
+# Se já tiver um chessboard-mapping.json pode usar o código abaixo
+# =================
+# from model import ChessboardCalibration
+# import cv2
+# from utils import (
+#   imshow
+# )
+
+# chessboard_calibration = ChessboardCalibration(debug=True)
+# frame = cv2.imread('/Volumes/ROND/chess/dataset/board/real_life/01.jpg')
+# found, board = chessboard_calibration.loadMapping()
+# if found:
+#   img = chessboard_calibration.applyMapping(frame)
+#   board.state(img)
+#   board.print()
+#   imshow('img', img)

@@ -145,4 +145,6 @@ Estamos fazendo um curso no course de machile learning e esse curso nos deu algu
 
 2. Uma das coisas que aprendi durante o curso é que independente do algoritmo, quem tem mais dados para treinar é o que se sai melhor.
 
-3. Um outro approuch seria utilizar o algoritmo treinado para gerar mais dados, ainda que o algoritmo faça uma detecção ruim podemos gerar o arquivo de anotação e no labelimg corrigir os bouding boxes que tiverem desempenho ruim. Com isso teríamos um aumento no dataset. 
+3. Um outro approuch seria utilizar o algoritmo treinado para gerar mais dados, ainda que o algoritmo faça uma detecção ruim podemos gerar o arquivo de anotação e no labelimg corrigir os bouding boxes que tiverem desempenho ruim. Com isso teríamos um aumento no dataset.
+
+[resultado]: Funcionou! Fizemos um script que gerou arquivos de anotação, corrigimos os errados e colocamos a rede para treinar novamente, isso resultou em um aumento considerável na precisão do modelo. Ele ainda erra algumas classes, vamos fazer uma análise com câmera real e verificar se precisamos de mais um rodada de aumento de dados.

@@ -11,7 +11,7 @@ class Game:
 
   def __init__(self):
     self.fps = 30
-    self.cam_address = 'http://192.168.0.105:4747/video'
+    self.cam_address = 'http://192.168.0.108:4747/video'
 
   def mapping(self):
     """
