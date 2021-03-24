@@ -1,5 +1,6 @@
 numpy==1.19.4
 opencv-python==4.4.0.46
+opencv-python-headless==4.5.1.48
 matplotlib==3.3.3
 scipy==1.5.4
 imutils==0.5.3
