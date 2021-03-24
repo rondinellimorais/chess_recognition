@@ -1,4 +1,6 @@
-# mock
+#
+# Se deseja construir um mapeamento novo use o código a seguir
+# =================
 from model import ChessboardCalibration
 import cv2
 from utils import (

@@ -1,25 +1,22 @@
 #!/bin/bash
 #
-# Build a virtual environment to get start 
+# Build a virtual environment to get start
+
+#
+# USAGE
+#
+# Esse script deve ser executado assim `source build.sh`, caso contrário
+# não vamos conseguir ativar o ambiente conda.
+#
+# https://stackoverflow.com/questions/55507519/python-activate-conda-env-through-shell-script
+#
 
 # create virtual environment
-rm -rf .venv
 rm -rf __pycache__
-python3 -m venv .venv
+conda create -n chess_recognition python=3.9 pip --yes
 
 # active virtual environment
-source .venv/bin/activate
-
-#
-# Workaround to the [#4919](https://github.com/scikit-image/scikit-image/issues/4919)
-# ModuleNotFoundError: No module named 'numpy'
-# when install scikit-image
-#
-# 06/01/2021
-python3 -m pip install numpy==1.19.4
+conda activate chess_recognition
 
 # install requirements
-python3 -m pip install -r requirements.txt
-
-# exit virtual environment
-deactivate
+pip install -r requirements.txt
