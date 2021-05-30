@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from .chessboard_calibration import ChessboardCalibration
 from .board import Board
 from .debugable import Debugable
