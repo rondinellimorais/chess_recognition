@@ -66,7 +66,7 @@ class Camera:
       retval, frame = self.cap.read()
 
       if not retval:
-        raise
+        raise Exception('Could not get the next video frame.')
 
       # define new resolution
       height, width = self.resolution

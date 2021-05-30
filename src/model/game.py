@@ -11,7 +11,7 @@ class Game:
 
   def __init__(self):
     self.fps = 30
-    self.cam_address = 'http://192.168.0.108:4747/video'
+    self.cam_address = 'http://192.168.0.110:4747/video'
 
   def mapping(self):
     """
@@ -53,7 +53,7 @@ class Game:
     """
     img = self.running_calibration.applyMapping(frame)
 
-    self.board.state(img)
+    # self.board.state(img)
 
     cv2.imshow("preview", img)
     if cv2.waitKey(1) & 0xFF == ord('q'):
