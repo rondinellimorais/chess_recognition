@@ -1,6 +1,7 @@
 from model.chessboard_calibration import ChessboardCalibration
 from model.board import Board
 from model.camera import Camera
+from dotenv import dotenv_values
 import cv2
 
 class Game:
@@ -10,8 +11,9 @@ class Game:
   board: Board
 
   def __init__(self):
-    self.fps = 30
-    self.cam_address = 'http://192.168.0.110:4747/video'
+    config = dotenv_values()
+    self.fps = int(config.get('CAM_FPS'))
+    self.cam_address = config.get('CAM_ADDRESS')
 
   def mapping(self):
     """

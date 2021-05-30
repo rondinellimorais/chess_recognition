@@ -7,6 +7,7 @@ parser.add_argument("-m", "--mapping",
                     action=BooleanOptionalAction,
                     default=False,
                     help="Starts the mapping of the board")
+
 parser.add_argument("-s", "--start",
                     action=BooleanOptionalAction,
                     default=False,
