@@ -1,7 +1,6 @@
+from typing import Tuple
 import cv2
 from utils import (
-  imshow,
-  random_color,
   perspective_transform,
   rotate_image,
   canny_edge,
@@ -14,7 +13,6 @@ from utils import (
 from model.board import Board
 from model.debugable import Debugable
 from model.square import Square
-from enumeration import Color
 import numpy as np
 import imutils
 import json
@@ -344,7 +342,7 @@ class ChessboardCalibration(Debugable):
     with open(os.path.join(self.__rootDir(), 'chessboard-mapping.json'), 'w') as f:
       f.write('%s' % json.dumps(dictionary))
 
-  def loadMapping(self) -> (bool, Board):
+  def loadMapping(self) -> Tuple[bool, Board]:
     """
     Load the chess board calibration mapping if exists.
     """

@@ -31,8 +31,8 @@ class Square:
     self.y2 = y2
     self.color = color
 
-  def createPiece(self, class_name, accuracy):
-    self.piece = Piece(class_name, accuracy)
+  def createPiece(self, class_name, accuracy, classID):
+    self.piece = Piece(class_name, accuracy, classID)
     self.isEmpty = False
 
   def toJson(self):

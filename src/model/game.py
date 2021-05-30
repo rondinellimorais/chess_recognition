@@ -67,6 +67,8 @@ class Game:
     if currentMillis - self.previousMillis >= int(self.__config.get('CHECK_BOARD_STATE_INTERVAL')):
       self.previousMillis = currentMillis
       self.board.state(img)
+      board_state = self.board.toMatrix()
+      print(board_state)
 
     cv2.imshow("preview", img)
     if cv2.waitKey(1) & 0xFF == ord('q'):
