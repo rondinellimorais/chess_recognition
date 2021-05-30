@@ -1,6 +1,4 @@
-import numpy as np
 import cv2
-from threading import Timer
 import time
 
 class Camera:
