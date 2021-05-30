@@ -47,6 +47,7 @@ class Board:
         square_areas.append(box(square.x1, square.y1, square.x2, square.y2).area)
 
     self.__squaresAverage = np.average(square_areas)
+    print('Squares Average......: {}'.format(self.__squaresAverage))
 
   def state(self, img):
     # previews all image classes

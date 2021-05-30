@@ -30,8 +30,6 @@ class Game:
     chessboard_calibration = ChessboardCalibration(debug=True)
     chessboard_calibration.mapping(
       chessboard_img=frame,
-      fix_rotate=True,
-      rotate_val=90,
       add_padding=True
     )
     chessboard_calibration.saveMapping()
