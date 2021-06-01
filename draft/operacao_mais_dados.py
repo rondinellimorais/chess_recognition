@@ -15,10 +15,7 @@
 # 
 from model import ChessboardCalibration, Darknet, Camera
 import cv2
-from utils import (
-  imshow,
-  listdir
-)
+import time
 
 darknet = Darknet.instance()
 
@@ -47,38 +44,25 @@ def didCaptureFrame(frame, camera):
   # Aqui vai da todos os erros de escopo possível
   # pois didCaptureFrame está em outro escopo
   # por isso as gambis abaixo
-  image_paths = listdir('data/cropped/*', '*.jpg')
-  current_number = len(image_paths) + 7
-  end_number = 237
-
-  if current_number > end_number:
-    camera.stopRunning()
   
+  identifier = time.time()
   full_img = frame
   cropped_img = chessboard_calibration.applyMapping(full_img) # 416 × 416
 
   cria_dado(
     img=cropped_img,
     network_size=(416, 416),
-    filename='JOGADA_{}'.format(current_number),
+    filename='{}'.format(identifier),
     folder='cropped'
   )
 
-  cria_dado(
-    img=full_img,
-    network_size=(608, 608),
-    filename='JOGADA_{}'.format(current_number),
-    folder='full'
-  )
-
-  if current_number < end_number:
-    camera.stopRunning()
-    input('Press any key to continue...')
-    camera = Camera('http://192.168.0.108:4747/video', fps=1)
-    camera.startRunning(didCaptureFrame)
+  camera.stopRunning()
+  input('Press any key to continue...')
+  camera = Camera('http://192.168.0.109:4747/video', fps=1)
+  camera.startRunning(didCaptureFrame)
 
 chessboard_calibration = ChessboardCalibration()
 found, _ = chessboard_calibration.loadMapping()
 if found:
-  camera = Camera('http://192.168.0.108:4747/video', fps=1)
+  camera = Camera('http://192.168.0.109:4747/video', fps=1)
   camera.startRunning(didCaptureFrame)
