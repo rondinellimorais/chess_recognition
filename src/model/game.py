@@ -42,7 +42,8 @@ class Game:
     chessboard_calibration = ChessboardCalibration(debug=True)
     chessboard_calibration.mapping(
       chessboard_img=frame,
-      fix_rotate=False,
+      fix_rotate=True,
+      rotate_val=90,
       add_padding=True
     )
     chessboard_calibration.saveMapping()
@@ -66,7 +67,7 @@ class Game:
 
   def __toPNGImage(self):
     out = BytesIO()
-    bytestring = chess.svg.board(self.__virtualBoard, size=608).encode('utf-8')
+    bytestring = chess.svg.board(self.__virtualBoard, size=640).encode('utf-8')
     cairosvg.svg2png(bytestring=bytestring, write_to=out)
     image = Image.open(out)
     return cv2.cvtColor(np.asarray(image), cv2.COLOR_BGR2RGB)

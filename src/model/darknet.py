@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from cv2.dnn import readNetFromDarknet, blobFromImage
+from dotenv import dotenv_values
 
 class Darknet:
 
@@ -10,11 +11,10 @@ class Darknet:
   __labels = []
 
   def __init__(self):
-    config_path = 'assets/dnn/yolov4.custom.cfg'
-    weights_path = 'assets/dnn/yolov4_best_v2.weights'
+    config = dotenv_values()
 
     # load model
-    self.__net = readNetFromDarknet(config_path, weights_path)
+    self.__net = readNetFromDarknet(config.get('CFG_FILE_PATH'), config.get('WEIGHTS_FILE_PATH'))
 
     # determine only the *output* layer names that we need from YOLO
     self.__out_layers = self.__net.getLayerNames()

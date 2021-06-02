@@ -51,7 +51,7 @@ class Board:
 
   def state(self, img):
     # previews all image classes
-    detections = self.network.predict(img=img, size=(608, 608), thresh=0.9, draw_and_save=True)
+    detections = self.network.predict(img=img, size=(640, 640), thresh=0.9, draw_and_save=True)
 
     self.resetState()
 
