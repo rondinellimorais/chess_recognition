@@ -8,7 +8,6 @@ from PIL import Image
 from io import BytesIO
 
 import cv2
-import time
 import chess
 import numpy as np
 import chess.svg
@@ -19,7 +18,6 @@ class Game:
   __cam_address: str
   __running_calibration: ChessboardCalibration
   __board: Board
-  __previousMillis: int = 0
   __config: Dict
   __virtualBoard: chess.Board
   __agent: Agent
@@ -29,7 +27,7 @@ class Game:
     self.__fps = int(self.__config.get('CAM_FPS'))
     self.__cam_address = self.__config.get('CAM_ADDRESS')
     self.__virtualBoard = chess.Board()
-    self.__agent = Agent()
+    self.__agent = Agent(self.__virtualBoard)
 
   def mapping(self):
     """
@@ -78,21 +76,17 @@ class Game:
     """
     img = self.__running_calibration.applyMapping(frame)
 
-    currentMillis = round(time.time() * 1000)
-
-    # check to see if it's time to running vision computer; that is, if the difference
-    # between the current time and last time we running vision computer is bigger than
-    # the interval at which we want to running vision computer.
-    if currentMillis - self.__previousMillis >= int(self.__config.get('CHECK_BOARD_STATE_INTERVAL')):
-      self.__previousMillis = currentMillis
+    key_pressed = cv2.waitKey(1)
+    if key_pressed & 0xFF == ord('q'):
+      camera.stopRunning()
+    elif key_pressed == 13: # Enter(13)
       self.__board.state(img)
       board_state = self.__board.toMatrix()
-      self.__agent.setState(board_state)
+
+      move = self.__agent.setState(board_state)
+      if move is not None:
+        self.__agent.makeMove(move)
 
     virtualBoardImage = self.__toPNGImage()
-    hstack = np.hstack((img, virtualBoardImage))
-
-    cv2.imshow('chess board computer vision', hstack)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        camera.stopRunning() 
-        cv2.destroyAllWindows()
+    img = np.hstack((img, virtualBoardImage)) # np.hstack tem um performance bem ruim :(
+    cv2.imshow('chess board computer vision', img)
