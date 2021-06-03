@@ -130,7 +130,10 @@ def cluster_points(points):
     cluster_dict[flat_clusters[i]].append(points[i])
   cluster_values = cluster_dict.values()
   clusters = map(lambda arr: (np.mean(np.array(arr)[:, 0]), np.mean(np.array(arr)[:, 1])), cluster_values)
-  return sorted(list(clusters), key=lambda k: [k[1], k[0]])
+  return sorted(round_iterable(list(clusters)), key=lambda k: [k[1], k[0]])
+
+def round_iterable(iterable):
+  return list(map(lambda item: (round(item[0]), round(item[1])), iterable))
 
 def draw_chessboard_mapping(img, matrix):
   if len(matrix) == 9:
