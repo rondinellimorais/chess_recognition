@@ -49,7 +49,13 @@ class Board:
     self.__squaresAverage = np.average(square_areas)
     print('Squares Average......: {}'.format(self.__squaresAverage))
 
-  def state(self, img):
+  def scan(self, img):
+    """
+    Scan chess board using computer vision
+
+    @return
+    A list of `Square` with position of each piece on image
+    """
     # previews all image classes
     detections = self.network.predict(img=img, size=(640, 640), thresh=0.9, draw_and_save=True)
 
@@ -99,12 +105,15 @@ class Board:
           else:
             print('[{}, {}] Empty'.format(r_idx, c_idx))
 
-  def toMatrix(self):
+  def toMatrix(self, squares: list[Square]) -> np.array:
+    """
+    parse a list of `Square` object to a `numpy` matrix
+    """
     piece_map = np.ones(64) * -1
     board_state = piece_map.reshape((8, 8)).astype(np.int32)
 
-    if self.squares is not None:
-      for (r_idx, row) in enumerate(self.squares):
+    if squares is not None:
+      for (r_idx, row) in enumerate(squares):
         for (c_idx, square) in enumerate(row):
           if not square.isEmpty:
             board_state[r_idx][c_idx] = square.piece.classID

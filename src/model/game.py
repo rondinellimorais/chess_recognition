@@ -80,12 +80,16 @@ class Game:
     if key_pressed & 0xFF == ord('q'):
       camera.stopRunning()
     elif key_pressed == 13: # Enter(13)
-      self.__board.state(img)
-      board_state = self.__board.toMatrix()
+      squares = self.__board.scan(img)
+      board_state = self.__board.toMatrix(squares)
 
-      move = self.__agent.setState(board_state)
-      if move is not None:
-        self.__agent.makeMove(move)
+      human_move = self.__agent.setState(board_state)
+      if human_move is not None:
+        self.__agent.makeMove(human_move)
+
+      cpu_move = self.__agent.selectMove()
+      if cpu_move is not None:
+        self.__agent.makeMove(cpu_move)
 
     virtualBoardImage = self.__toPNGImage()
     img = np.hstack((img, virtualBoardImage)) # np.hstack tem um performance bem ruim :(
