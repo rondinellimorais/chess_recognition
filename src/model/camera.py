@@ -83,6 +83,7 @@ class Camera:
     """
     self.stop = True
     if self.cap:
+      cv2.destroyAllWindows()
       self.destroy()
 
   def destroy(self):
