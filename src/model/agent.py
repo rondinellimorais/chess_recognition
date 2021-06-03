@@ -1,3 +1,4 @@
+from model.virtual_board import VirtualBoard
 from typing import Optional
 import numpy as np
 import chess
@@ -11,7 +12,7 @@ class Agent:
   Smart chess agent
   """
   __current_board_state: np.array = None
-  __board: chess.Board = None
+  __board: VirtualBoard = None
   __indexes = sorted(np.arange(1, 9), reverse=True)
   __columns = list("abcdefgh")
   __move_history: list[Optional[chess.Move]] = []
@@ -192,20 +193,19 @@ class Agent:
           alpha = score
     return alpha
 
-  def setState(self, board_state) -> Optional[chess.Move]:
-    """
-    update chess board state matrix
-
-    @return
-    The `chess.Move` made based on state matrices
-    """
-    # check if state change
-    result = np.abs(self.__current_board_state - board_state)
-
-    # save new state
+  def updateState(self, board_state):
     self.__current_board_state = board_state
 
+  def state2Move(self, board_state: np.array) -> Optional[chess.Move]:
+    """
+    generate a `chess.Move` based on state matrices
+
+    @return
+    A valid `chess.Move` object
+    """
     coordinates = []
+    result = np.abs(self.__current_board_state - board_state)
+
     for ridx, row in enumerate(result):
       for cidx, col in enumerate(row):
         if col > 0:
@@ -221,7 +221,7 @@ class Agent:
     """
     self.__board.push(move)
 
-  def selectMove(self, depth: int = 3):
+  def chooseMove(self, depth: int = 3):
     bestMove = chess.Move.null()
     bestValue = -99999
     alpha = -100000

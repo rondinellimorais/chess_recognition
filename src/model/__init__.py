@@ -9,3 +9,4 @@ from .camera import Camera
 from .darknet import Darknet
 from .game import Game
 from .agent import Agent
+from .virtual_board import VirtualBoard

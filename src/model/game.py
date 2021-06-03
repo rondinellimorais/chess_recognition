@@ -3,6 +3,7 @@ from model.chessboard_calibration import ChessboardCalibration
 from model.board import Board
 from model.agent import Agent
 from model.camera import Camera
+from model.virtual_board import VirtualBoard
 from dotenv import dotenv_values
 from PIL import Image
 from io import BytesIO
@@ -19,14 +20,14 @@ class Game:
   __running_calibration: ChessboardCalibration
   __board: Board
   __config: Dict
-  __virtualBoard: chess.Board
+  __virtualBoard: VirtualBoard
   __agent: Agent
 
   def __init__(self):
     self.__config = dotenv_values()
     self.__fps = int(self.__config.get('CAM_FPS'))
     self.__cam_address = self.__config.get('CAM_ADDRESS')
-    self.__virtualBoard = chess.Board()
+    self.__virtualBoard = VirtualBoard()
     self.__agent = Agent(self.__virtualBoard)
 
   def mapping(self):
@@ -83,13 +84,15 @@ class Game:
       squares = self.__board.scan(img)
       board_state = self.__board.toMatrix(squares)
 
-      human_move = self.__agent.setState(board_state)
+      human_move = self.__agent.state2Move(board_state)
       if human_move is not None:
         self.__agent.makeMove(human_move)
+        self.__agent.updateState(board_state)
 
-      cpu_move = self.__agent.selectMove()
+      cpu_move = self.__agent.chooseMove()
       if cpu_move is not None:
         self.__agent.makeMove(cpu_move)
+        self.__agent.updateState(self.__virtualBoard.state())
 
     virtualBoardImage = self.__toPNGImage()
     img = np.hstack((img, virtualBoardImage)) # np.hstack tem um performance bem ruim :(
