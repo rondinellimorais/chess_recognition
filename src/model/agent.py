@@ -6,6 +6,7 @@ import chess.svg
 import chess.pgn
 import chess.polyglot
 import chess.engine
+import time
 
 class Agent:
   """
@@ -15,7 +16,6 @@ class Agent:
   __board: VirtualBoard = None
   __indexes = sorted(np.arange(1, 9), reverse=True)
   __columns = list("abcdefgh")
-  __move_history: list[Optional[chess.Move]] = []
 
   ___initial_board_state = np.array([
     [7, 11, 8, 10, 9, 8, 11, 7],
@@ -28,70 +28,80 @@ class Agent:
     [1, 3, 2, 5, 4, 2, 3, 1]
   ])
 
-  __pawntable = [
-    0, 0, 0, 0, 0, 0, 0, 0,
-    5, 10, 10, -20, -20, 10, 10, 5,
-    5, -5, -10, 0, 0, -10, -5, 5,
-    0, 0, 0, 20, 20, 0, 0, 0,
-    5, 5, 10, 25, 25, 10, 5, 5,
-    10, 10, 20, 30, 30, 20, 10, 10,
-    50, 50, 50, 50, 50, 50, 50, 50,
-    0, 0, 0, 0, 0, 0, 0, 0]
+  __pawnEvalWhite = np.reshape([
+    [0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0],
+    [5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0],
+    [1.0,  1.0,  2.0,  3.0,  3.0,  2.0,  1.0,  1.0],
+    [0.5,  0.5,  1.0,  2.5,  2.5,  1.0,  0.5,  0.5],
+    [0.0,  0.0,  0.0,  2.0,  2.0,  0.0,  0.0,  0.0],
+    [0.5, -0.5, -1.0,  0.0,  0.0, -1.0, -0.5,  0.5],
+    [0.5,  1.0, 1.0,  -2.0, -2.0,  1.0,  1.0,  0.5],
+    [0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0]
+  ], 64)
 
-  __knightstable = [
-    -50, -40, -30, -30, -30, -30, -40, -50,
-    -40, -20, 0, 5, 5, 0, -20, -40,
-    -30, 5, 10, 15, 15, 10, 5, -30,
-    -30, 0, 15, 20, 20, 15, 0, -30,
-    -30, 5, 15, 20, 20, 15, 5, -30,
-    -30, 0, 10, 15, 15, 10, 0, -30,
-    -40, -20, 0, 0, 0, 0, -20, -40,
-    -50, -40, -30, -30, -30, -30, -40, -50
-  ]
+  __pawnEvalBlack = np.flip(__pawnEvalWhite, axis=0)
 
-  __bishopstable = [
-    -20, -10, -10, -10, -10, -10, -10, -20,
-    -10, 5, 0, 0, 0, 0, 5, -10,
-    -10, 10, 10, 10, 10, 10, 10, -10,
-    -10, 0, 10, 10, 10, 10, 0, -10,
-    -10, 5, 5, 10, 10, 5, 5, -10,
-    -10, 0, 5, 10, 10, 5, 0, -10,
-    -10, 0, 0, 0, 0, 0, 0, -10,
-    -20, -10, -10, -10, -10, -10, -10, -20
-  ]
+  __knightEval = np.reshape([
+    [-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0],
+    [-4.0, -2.0,  0.0,  0.0,  0.0,  0.0, -2.0, -4.0],
+    [-3.0,  0.0,  1.0,  1.5,  1.5,  1.0,  0.0, -3.0],
+    [-3.0,  0.5,  1.5,  2.0,  2.0,  1.5,  0.5, -3.0],
+    [-3.0,  0.0,  1.5,  2.0,  2.0,  1.5,  0.0, -3.0],
+    [-3.0,  0.5,  1.0,  1.5,  1.5,  1.0,  0.5, -3.0],
+    [-4.0, -2.0,  0.0,  0.5,  0.5,  0.0, -2.0, -4.0],
+    [-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0]
+  ], 64)
 
-  __rookstable = [
-    0, 0, 0, 5, 5, 0, 0, 0,
-    -5, 0, 0, 0, 0, 0, 0, -5,
-    -5, 0, 0, 0, 0, 0, 0, -5,
-    -5, 0, 0, 0, 0, 0, 0, -5,
-    -5, 0, 0, 0, 0, 0, 0, -5,
-    -5, 0, 0, 0, 0, 0, 0, -5,
-    5, 10, 10, 10, 10, 10, 10, 5,
-    0, 0, 0, 0, 0, 0, 0, 0
-  ]
+  __bishopEvalWhite = np.reshape([
+    [ -2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0],
+    [ -1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -1.0],
+    [ -1.0,  0.0,  0.5,  1.0,  1.0,  0.5,  0.0, -1.0],
+    [ -1.0,  0.5,  0.5,  1.0,  1.0,  0.5,  0.5, -1.0],
+    [ -1.0,  0.0,  1.0,  1.0,  1.0,  1.0,  0.0, -1.0],
+    [ -1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0, -1.0],
+    [ -1.0,  0.5,  0.0,  0.0,  0.0,  0.0,  0.5, -1.0],
+    [ -2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0]
+  ], 64)
 
-  __queenstable = [
-    -20, -10, -10, -5, -5, -10, -10, -20,
-    -10, 0, 0, 0, 0, 0, 0, -10,
-    -10, 5, 5, 5, 5, 5, 0, -10,
-    0, 0, 5, 5, 5, 5, 0, -5,
-    -5, 0, 5, 5, 5, 5, 0, -5,
-    -10, 0, 5, 5, 5, 5, 0, -10,
-    -10, 0, 0, 0, 0, 0, 0, -10,
-    -20, -10, -10, -5, -5, -10, -10, -20
-  ]
+  __bishopEvalBlack = np.flip(__bishopEvalWhite, axis=0)
 
-  __kingstable = [
-    20, 30, 10, 0, 0, 10, 30, 20,
-    20, 20, 0, 0, 0, 0, 20, 20,
-    -10, -20, -20, -20, -20, -20, -20, -10,
-    -20, -30, -30, -40, -40, -30, -30, -20,
-    -30, -40, -40, -50, -50, -40, -40, -30,
-    -30, -40, -40, -50, -50, -40, -40, -30,
-    -30, -40, -40, -50, -50, -40, -40, -30,
-    -30, -40, -40, -50, -50, -40, -40, -30
-  ]
+  __rookEvalWhite = np.reshape([
+    [  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0],
+    [  0.5,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  0.5],
+    [ -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5],
+    [ -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5],
+    [ -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5],
+    [ -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5],
+    [ -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5],
+    [  0.0,   0.0, 0.0,  0.5,  0.5,  0.0,  0.0,  0.0]
+  ], 64)
+
+  __rookEvalBlack = np.flip(__rookEvalWhite, axis=0)
+
+  __evalQueen = np.reshape([
+    [ -2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0],
+    [ -1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -1.0],
+    [ -1.0,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -1.0],
+    [ -0.5,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -0.5],
+    [  0.0,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -0.5],
+    [ -1.0,  0.5,  0.5,  0.5,  0.5,  0.5,  0.0, -1.0],
+    [ -1.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.0, -1.0],
+    [ -2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0]
+  ], 64)
+
+  __kingEvalWhite = np.reshape([
+    [ -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0],
+    [ -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0],
+    [ -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0],
+    [ -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0],
+    [ -2.0, -3.0, -3.0, -4.0, -4.0, -3.0, -3.0, -2.0],
+    [ -1.0, -2.0, -2.0, -2.0, -2.0, -2.0, -2.0, -1.0],
+    [  2.0,  2.0,  0.0,  0.0,  0.0,  0.0,  2.0,  2.0 ],
+    [  2.0,  3.0,  1.0,  0.0,  0.0,  1.0,  3.0,  2.0 ]
+  ], 64)
+
+  __kingEvalBlack = np.flip(__kingEvalWhite, axis=0)
+  __position_count = 0
 
   def __init__(self, board):
     self.__current_board_state = self.___initial_board_state
@@ -115,83 +125,97 @@ class Agent:
           return move
     return None
 
-  def __evaluateBoard(self):
-    if self.__board.is_checkmate():
-      if self.__board.turn:
-        return -9999
-      else:
-        return 9999
-    if self.__board.is_stalemate():
-      return 0
-    if self.__board.is_insufficient_material():
-      return 0
+  def chooseMove(self) -> Optional[chess.Move]:
+    best_move = self.__getBestMove()
+    if self.__board.is_game_over():
+      print('Game over')
+      return None
+    return best_move
 
-    wp = len(self.__board.pieces(chess.PAWN, chess.WHITE))
-    bp = len(self.__board.pieces(chess.PAWN, chess.BLACK))
-    wn = len(self.__board.pieces(chess.KNIGHT, chess.WHITE))
-    bn = len(self.__board.pieces(chess.KNIGHT, chess.BLACK))
-    wb = len(self.__board.pieces(chess.BISHOP, chess.WHITE))
-    bb = len(self.__board.pieces(chess.BISHOP, chess.BLACK))
-    wr = len(self.__board.pieces(chess.ROOK, chess.WHITE))
-    br = len(self.__board.pieces(chess.ROOK, chess.BLACK))
-    wq = len(self.__board.pieces(chess.QUEEN, chess.WHITE))
-    bq = len(self.__board.pieces(chess.QUEEN, chess.BLACK))
+  def __getBestMove(self, depth = 3) -> Optional[chess.Move]:
+    if self.__board.is_game_over():
+      print('Game over')
+      return
 
-    material = 100 * (wp - bp) + 320 * (wn - bn) + 330 * (wb - bb) + 500 * (wr - br) + 900 * (wq - bq)
+    self.__position_count = 0
 
-    pawnsq = sum([self.__pawntable[i] for i in self.__board.pieces(chess.PAWN, chess.WHITE)])
-    pawnsq = pawnsq + sum([-self.__pawntable[chess.square_mirror(i)] for i in self.__board.pieces(chess.PAWN, chess.BLACK)])
-    knightsq = sum([self.__knightstable[i] for i in self.__board.pieces(chess.KNIGHT, chess.WHITE)])
-    knightsq = knightsq + sum([-self.__knightstable[chess.square_mirror(i)] for i in self.__board.pieces(chess.KNIGHT, chess.BLACK)])
-    bishopsq = sum([self.__bishopstable[i] for i in self.__board.pieces(chess.BISHOP, chess.WHITE)])
-    bishopsq = bishopsq + sum([-self.__bishopstable[chess.square_mirror(i)] for i in self.__board.pieces(chess.BISHOP, chess.BLACK)])
-    rooksq = sum([self.__rookstable[i] for i in self.__board.pieces(chess.ROOK, chess.WHITE)])
-    rooksq = rooksq + sum([-self.__rookstable[chess.square_mirror(i)] for i in self.__board.pieces(chess.ROOK, chess.BLACK)])
-    queensq = sum([self.__queenstable[i] for i in self.__board.pieces(chess.QUEEN, chess.WHITE)])
-    queensq = queensq + sum([-self.__queenstable[chess.square_mirror(i)] for i in self.__board.pieces(chess.QUEEN, chess.BLACK)])
-    kingsq = sum([self.__kingstable[i] for i in self.__board.pieces(chess.KING, chess.WHITE)])
-    kingsq = kingsq + sum([-self.__kingstable[chess.square_mirror(i)] for i in self.__board.pieces(chess.KING, chess.BLACK)])
+    d = time.time()
+    best_move = self.__minimaxRoot(depth, True)
+    d2 = time.time()
+    moveTime = (d2 - d);
+    positionsPerS = (self.__position_count * 1000 / moveTime)
 
-    eval = material + pawnsq + knightsq + bishopsq + rooksq + queensq + kingsq
-    if self.__board.turn:
-      return eval
-    else:
-      return -eval
+    print('Positions evaluated: {}'.format(self.__position_count))
+    print('Time: {:.3f}s'.format(moveTime/1000))
+    print('Positions/s: {}\n\n'.format(positionsPerS))
 
-  def __alphaBeta(self, alpha, beta, depthleft):
-    bestscore = -9999
-    if (depthleft == 0):
-      return self.__quiesce(alpha, beta)
+    return best_move
+
+  def __minimaxRoot(self, depth: int, is_maximising_player: bool) -> Optional[chess.Move]:
+    best_move = -9999
+    best_move_found: Optional[chess.Move] = None
+
     for move in self.__board.legal_moves:
-      self.makeMove(move)
-      score = -self.__alphaBeta(-beta, -alpha, depthleft - 1)
+      self.__board.push(move)
+      value = self.__miniMax(depth - 1, -10000, 10000, not is_maximising_player)
       self.__board.pop()
-      if (score >= beta):
-        return score
-      if (score > bestscore):
-        bestscore = score
-      if (score > alpha):
-        alpha = score
-    return bestscore
+      if value >= best_move:
+        best_move = value
+        best_move_found = move
+    return best_move_found
 
-  def __quiesce(self, alpha, beta ):
-    stand_pat = self.__evaluateBoard()
-    if( stand_pat >= beta ):
-      return beta
-    if( alpha < stand_pat ):
-      alpha = stand_pat
+  def __miniMax(self, depth: int, alpha: int, beta: int, is_maximising_player: bool) -> int:
+    self.__position_count += 1
+    if depth == 0:
+      return -self.__evaluateBoard()
 
-    for move in self.__board.legal_moves:
-      if self.__board.is_capture(move):
-        self.makeMove(move)
-        score = -self.__quiesce(-beta, -alpha )
+    if is_maximising_player:
+      best_move = -9999
+      for move in self.__board.legal_moves:
+        self.__board.push(move)
+        best_move = max(best_move, self.__miniMax(depth - 1, alpha, beta, not is_maximising_player))
         self.__board.pop()
+        alpha = max(alpha, best_move);
+        if beta <= alpha:
+          return best_move
+      return best_move
+    else:
+      best_move = 9999
+      for move in self.__board.legal_moves:
+        self.__board.push(move)
+        best_move = min(best_move, self.__miniMax(depth - 1, alpha, beta, not is_maximising_player))
+        self.__board.pop()
+        beta = min(beta, best_move)
+        if beta <= alpha:
+          return best_move
+      return best_move
 
-        if( score >= beta ):
-          return beta
-        if( score > alpha ):
-          alpha = score
-    return alpha
+  def __evaluateBoard(self):
+    total_evaluation = 0
+    for i in range(64):
+      total_evaluation = total_evaluation + self.__getPieceValue(self.__board.piece_at(i), i)
+    return total_evaluation
+
+  def __getAbsoluteValue(self, piece: chess.Piece, is_white: bool, index: int) -> int:
+    if piece.symbol().lower() == 'p':
+      return 10 + (is_white if self.__pawnEvalWhite[index] else self.__pawnEvalBlack[index])
+    elif piece.symbol().lower() == 'r':
+      return 50 + (is_white if self.__rookEvalWhite[index] else self.__rookEvalBlack[index])
+    elif piece.symbol().lower() == 'n':
+      return 30 + self.__knightEval[index]
+    elif piece.symbol().lower() == 'b':
+      return 30 + (is_white if self.__bishopEvalWhite[index] else self.__bishopEvalBlack[index])
+    elif piece.symbol().lower() == 'q':
+      return 90 + self.__evalQueen[index]
+    elif piece.symbol().lower() == 'k':
+      return 900 + (is_white if self.__kingEvalWhite[index] else self.__kingEvalBlack[index])
+
+  def __getPieceValue(self, piece: Optional[chess.Piece], index: int) -> int:
+    if piece is None:
+      return 0
+    
+    absolute_value = self.__getAbsoluteValue(piece, piece.color == chess.WHITE, index)
+    return absolute_value if piece.color == chess.WHITE else -absolute_value
 
   def updateState(self, board_state):
     self.__current_board_state = board_state
@@ -220,22 +244,3 @@ class Agent:
     Make a move on virtual chess board
     """
     self.__board.push(move)
-
-  def chooseMove(self, depth: int = 3):
-    bestMove = chess.Move.null()
-    bestValue = -99999
-    alpha = -100000
-    beta = 100000
-
-    for move in self.__board.legal_moves:
-      self.makeMove(move)
-      boardValue = -self.__alphaBeta(-beta, -alpha, depth-1)
-      if boardValue > bestValue:
-        bestValue = boardValue
-        bestMove = move
-      if( boardValue > alpha ):
-        alpha = boardValue
-      self.__board.pop()
-
-    self.__move_history.append(bestMove)
-    return bestMove
