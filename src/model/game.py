@@ -20,15 +20,13 @@ class Game:
   __running_calibration: ChessboardCalibration
   __board: Board
   __config: Dict
-  __virtualBoard: VirtualBoard
   __agent: Agent
 
   def __init__(self):
     self.__config = dotenv_values()
     self.__fps = int(self.__config.get('CAM_FPS'))
     self.__cam_address = self.__config.get('CAM_ADDRESS')
-    self.__virtualBoard = VirtualBoard()
-    self.__agent = Agent(self.__virtualBoard)
+    self.__agent = Agent()
 
   def mapping(self):
     """
@@ -66,7 +64,7 @@ class Game:
 
   def __toPNGImage(self):
     out = BytesIO()
-    bytestring = chess.svg.board(self.__virtualBoard, size=640).encode('utf-8')
+    bytestring = chess.svg.board(self.__agent.board, size=640).encode('utf-8')
     cairosvg.svg2png(bytestring=bytestring, write_to=out)
     image = Image.open(out)
     return cv2.cvtColor(np.asarray(image), cv2.COLOR_BGR2RGB)
@@ -83,7 +81,6 @@ class Game:
     elif key_pressed == 13: # Enter(13)
       squares = self.__board.scan(img)
       board_state = self.__board.toMatrix(squares)
-
       human_move = self.__agent.state2Move(board_state)
       if human_move is not None:
         self.__agent.makeMove(human_move)
@@ -92,7 +89,7 @@ class Game:
       cpu_move = self.__agent.chooseMove()
       if cpu_move is not None:
         self.__agent.makeMove(cpu_move)
-        self.__agent.updateState(self.__virtualBoard.state())
+        self.__agent.updateState(self.__agent.board.state())
 
     virtualBoardImage = self.__toPNGImage()
     img = np.hstack((img, virtualBoardImage)) # np.hstack tem um performance bem ruim :(

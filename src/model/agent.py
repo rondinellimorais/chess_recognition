@@ -12,8 +12,9 @@ class Agent:
   """
   Smart chess agent
   """
+  board: VirtualBoard = None
+
   __current_board_state: np.array = None
-  __board: VirtualBoard = None
   __indexes = sorted(np.arange(1, 9), reverse=True)
   __columns = list("abcdefgh")
 
@@ -103,9 +104,9 @@ class Agent:
   __kingEvalBlack = np.flip(__kingEvalWhite, axis=0)
   __position_count = 0
 
-  def __init__(self, board):
+  def __init__(self):
     self.__current_board_state = self.___initial_board_state
-    self.__board = board
+    self.board = VirtualBoard()
 
   def __validMove(self, coordinates) -> chess.Move:
     """
@@ -120,20 +121,20 @@ class Agent:
     if len(moviments) > 0:
       for uci_str in moviments:
         move = chess.Move.from_uci(uci_str)
-        if move in self.__board.legal_moves:
+        if move in self.board.legal_moves:
           print('Move coordinate ........: {}'.format(uci_str))
           return move
     return None
 
   def chooseMove(self) -> Optional[chess.Move]:
     best_move = self.__getBestMove()
-    if self.__board.is_game_over():
+    if self.board.is_game_over():
       print('Game over')
       return None
     return best_move
 
   def __getBestMove(self, depth = 3) -> Optional[chess.Move]:
-    if self.__board.is_game_over():
+    if self.board.is_game_over():
       print('Game over')
       return
 
@@ -155,10 +156,10 @@ class Agent:
     best_move = -9999
     best_move_found: Optional[chess.Move] = None
 
-    for move in self.__board.legal_moves:
-      self.__board.push(move)
+    for move in self.board.legal_moves:
+      self.board.push(move)
       value = self.__miniMax(depth - 1, -10000, 10000, not is_maximising_player)
-      self.__board.pop()
+      self.board.pop()
       if value >= best_move:
         best_move = value
         best_move_found = move
@@ -171,20 +172,20 @@ class Agent:
 
     if is_maximising_player:
       best_move = -9999
-      for move in self.__board.legal_moves:
-        self.__board.push(move)
+      for move in self.board.legal_moves:
+        self.board.push(move)
         best_move = max(best_move, self.__miniMax(depth - 1, alpha, beta, not is_maximising_player))
-        self.__board.pop()
+        self.board.pop()
         alpha = max(alpha, best_move);
         if beta <= alpha:
           return best_move
       return best_move
     else:
       best_move = 9999
-      for move in self.__board.legal_moves:
-        self.__board.push(move)
+      for move in self.board.legal_moves:
+        self.board.push(move)
         best_move = min(best_move, self.__miniMax(depth - 1, alpha, beta, not is_maximising_player))
-        self.__board.pop()
+        self.board.pop()
         beta = min(beta, best_move)
         if beta <= alpha:
           return best_move
@@ -193,7 +194,7 @@ class Agent:
   def __evaluateBoard(self):
     total_evaluation = 0
     for i in range(64):
-      total_evaluation = total_evaluation + self.__getPieceValue(self.__board.piece_at(i), i)
+      total_evaluation = total_evaluation + self.__getPieceValue(self.board.piece_at(i), i)
     return total_evaluation
 
   def __getAbsoluteValue(self, piece: chess.Piece, is_white: bool, index: int) -> int:
@@ -243,4 +244,4 @@ class Agent:
     """
     Make a move on virtual chess board
     """
-    self.__board.push(move)
+    self.board.push(move)
