@@ -10,3 +10,4 @@ from .darknet import Darknet
 from .game import Game
 from .agent import Agent
 from .virtual_board import VirtualBoard
+from .gui import GUI

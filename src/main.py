@@ -1,5 +1,7 @@
+import sys
 from argparse import ArgumentParser, BooleanOptionalAction
 from model import Game
+from pyqtgraph.Qt import QtGui
 
 # define arguments
 parser = ArgumentParser()
@@ -22,4 +24,7 @@ if __name__ == "__main__":
 
   # start a game
   if args['start']:
-    Game().start()
+    app = QtGui.QApplication(sys.argv)
+    game = Game()
+    game.start()
+    sys.exit(app.exec_())
