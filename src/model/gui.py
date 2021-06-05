@@ -18,6 +18,7 @@ class GUI(QtGui.QMainWindow):
     self.__canvas = pg.GraphicsLayoutWidget(size=self.__window_size)
     self.__canvas.setWindowTitle(title)
     self.__canvas.ci.layout.setContentsMargins(0, 0, 0, 0)
+    self.__canvas.keyPressEvent = self.__keyPressEvent
 
     ## add image grid
     self.imageItems:list[pg.ImageItem] = []
@@ -29,6 +30,14 @@ class GUI(QtGui.QMainWindow):
 
     ## legends
     self.__createConsole()
+
+  def __keyPressEvent(self, e):
+    if type(e) == QtGui.QKeyEvent:
+      if e.key() == QtCore.Qt.Key_Return or e.key() == QtCore.Qt.Key_Enter:
+        self.setConsoleText('roda o darknet')
+      e.accept()
+    else:
+      e.ignore()
 
   def __addGridLayout(self, numrows: int, numcols: int) -> list[pg.ViewBox]:
     views: list[pg.ViewBox] = []

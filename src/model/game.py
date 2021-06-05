@@ -79,8 +79,6 @@ class Game(GUI):
     self.setImage(img)
     self.__updateFrameRate()
 
-    self.setConsoleText('Rondinelli Morais {}'.format(self.__lastupdate))
-
     QtCore.QTimer.singleShot(1, self.__captureFrame)
 
   def __updateFrameRate(self):
