@@ -20,7 +20,7 @@ class GUI(QtGui.QMainWindow):
     self.imageItems:list[pg.ImageItem] = []
     views = self.__addGridLayout(numrows=self.__grid_size[1], numcols=self.__grid_size[0])
     for view in views:
-      imgItem = pg.ImageItem()
+      imgItem = pg.ImageItem(axisOrder='row-major')
       self.imageItems.append(imgItem)
       view.addItem(imgItem)
 
@@ -35,10 +35,11 @@ class GUI(QtGui.QMainWindow):
         view.suggestPadding = lambda *_: 0.0
         view.installEventFilter(self)
         view.setBackgroundColor('r')
+        view.invertY()
         views.append(view)
     return views
 
-  def __createConsole(self) -> pg.ViewBox:
+  def __createConsole(self):
     self.label = QtGui.QLabel(self.__canvas)
     self.label.setStyleSheet('QLabel { color: yellow; margin: 10px; font-weight: bold }')
 

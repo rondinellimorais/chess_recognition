@@ -74,9 +74,9 @@ class Game(GUI):
   def __captureFrame(self):
     frame = self.__camera.capture()
     img = self.__running_calibration.applyMapping(frame)
-    
-    rgb_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    self.setImage(cv2.rotate(rgb_img, cv2.ROTATE_90_CLOCKWISE))
+
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    self.setImage(img)
     self.__updateFrameRate()
 
     QtCore.QTimer.singleShot(1, self.__captureFrame)
