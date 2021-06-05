@@ -2,6 +2,8 @@ import sys
 import time
 
 import cv2
+from pyqtgraph import Qt
+from pyqtgraph.graphicsItems.ViewBox.ViewBox import ViewBox
 from model.camera import Camera
 from pyqtgraph.Qt import QtCore, QtGui
 import numpy as np
@@ -30,6 +32,9 @@ class App(QtGui.QMainWindow):
       self.imgs.append(imgItem)
       view.addItem(imgItem)
 
+    ## legends
+    self.__createConsole()
+
     #### Set Data  #####################
     self.counter = 0
     self.fps = 0.
@@ -51,6 +56,10 @@ class App(QtGui.QMainWindow):
         view.setBackgroundColor('r')
         views.append(view)
     return views
+
+  def __createConsole(self) -> pg.ViewBox:
+    self.label = QtGui.QLabel(self.__canvas)
+    self.label.setStyleSheet('QLabel { color: yellow; margin: 10px; font-weight: bold }')
 
   def eventFilter(self, watched, event):
     if event.type() == QtCore.QEvent.GraphicsSceneWheel:
@@ -80,8 +89,9 @@ class App(QtGui.QMainWindow):
     fps2 = 1.0 / dt
     self.lastupdate = now
     self.fps = self.fps * 0.9 + fps2 * 0.1
-    tx = 'Mean Frame Rate:  {:.3f} FPS'.format(self.fps)
-    # self.label.setText(tx)
+    tx = 'Mean Frame Rate:  {:.2f} FPS'.format(self.fps)
+    self.label.setText(tx)
+    self.label.adjustSize()
     QtCore.QTimer.singleShot(1, self.__update)
     self.counter += 1
 
