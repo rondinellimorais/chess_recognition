@@ -1,4 +1,5 @@
 import sys
+from typing import Optional
 
 from pyqtgraph.Qt import QtCore, QtGui
 import pyqtgraph as pg
@@ -7,6 +8,8 @@ class GUI(QtGui.QMainWindow):
   __canvas: pg.GraphicsLayoutWidget = None
   __grid_size = (2, 1)
   __window_size = (500 * __grid_size[0], 500 * __grid_size[1])
+  __console_texts: list[str] = []
+  __max_buffer_size = 10
 
   def __init__(self, title: str = 'preview'):
     super(GUI, self).__init__(parent=None)
@@ -43,8 +46,21 @@ class GUI(QtGui.QMainWindow):
     self.label = QtGui.QLabel(self.__canvas)
     self.label.setStyleSheet('QLabel { color: yellow; margin: 10px; font-weight: bold }')
 
-  def setConsoleText(self, text: str = ''):
-    self.label.setText(text)
+  def setConsoleText(self, text: str = '', index: Optional[int] = None):
+    if index is None:
+      self.__console_texts.append(text)
+    else:
+      if len(self.__console_texts) > 0:
+        self.__console_texts.pop(index)
+      self.__console_texts.insert(index, text)
+
+    if len(self.__console_texts) > self.__max_buffer_size:
+      self.__console_texts.pop(1)
+
+    self.__showConsoleText()
+
+  def __showConsoleText(self):
+    self.label.setText('\n'.join(self.__console_texts))
     self.label.adjustSize()
 
   def eventFilter(self, watched, event):

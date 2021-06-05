@@ -79,6 +79,8 @@ class Game(GUI):
     self.setImage(img)
     self.__updateFrameRate()
 
+    self.setConsoleText('Rondinelli Morais {}'.format(self.__lastupdate))
+
     QtCore.QTimer.singleShot(1, self.__captureFrame)
 
   def __updateFrameRate(self):
@@ -90,7 +92,7 @@ class Game(GUI):
     fps2 = 1.0 / dt
     self.__lastupdate = now
     self.__fps = self.__fps * 0.9 + fps2 * 0.1
-    self.setConsoleText('Mean Frame Rate:  {:.2f} FPS'.format(self.__fps))
+    self.setConsoleText('Mean Frame Rate:  {:.2f} FPS'.format(self.__fps), index=0)
 
   def __toPNGImage(self):
     out = BytesIO()
