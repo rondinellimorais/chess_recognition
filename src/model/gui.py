@@ -1,7 +1,6 @@
-import sys
 from typing import Optional
-
 from pyqtgraph.Qt import QtCore, QtGui
+
 import pyqtgraph as pg
 
 class GUI(QtGui.QMainWindow):
@@ -18,7 +17,6 @@ class GUI(QtGui.QMainWindow):
     self.__canvas = pg.GraphicsLayoutWidget(size=self.__window_size)
     self.__canvas.setWindowTitle(title)
     self.__canvas.ci.layout.setContentsMargins(0, 0, 0, 0)
-    self.__canvas.keyPressEvent = self.__keyPressEvent
 
     ## add image grid
     self.imageItems:list[pg.ImageItem] = []
@@ -28,16 +26,12 @@ class GUI(QtGui.QMainWindow):
       self.imageItems.append(imgItem)
       view.addItem(imgItem)
 
-    ## legends
+    ## setup console log
     self.__createConsole()
-
-  def __keyPressEvent(self, e):
-    if type(e) == QtGui.QKeyEvent:
-      if e.key() == QtCore.Qt.Key_Return or e.key() == QtCore.Qt.Key_Enter:
-        self.setConsoleText('roda o darknet')
-      e.accept()
-    else:
-      e.ignore()
+  
+  def setKeyPressEvent(self, callback):
+    if callback is not None:
+      self.__canvas.keyPressEvent = callback
 
   def __addGridLayout(self, numrows: int, numcols: int) -> list[pg.ViewBox]:
     views: list[pg.ViewBox] = []

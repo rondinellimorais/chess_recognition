@@ -7,7 +7,7 @@ from model.gui import GUI
 from dotenv import dotenv_values
 from PIL import Image
 from io import BytesIO
-from pyqtgraph.Qt import QtCore
+from pyqtgraph.Qt import QtCore, QtGui
 
 import cv2
 import chess
@@ -68,15 +68,15 @@ class Game(GUI):
     if not found:
       raise Exception('No mapping found. Run calibration mapping')
 
-    self.show()
     self.__captureFrame()
+    self.setKeyPressEvent(self.__keyPressEvent)
+    self.show()
 
   def __captureFrame(self):
     frame = self.__camera.capture()
-    img = self.__running_calibration.applyMapping(frame)
-
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    self.setImage(img)
+    self.__processed_image = self.__running_calibration.applyMapping(frame)
+    self.__processed_image = cv2.cvtColor(self.__processed_image, cv2.COLOR_BGR2RGB)
+    self.setImage(self.__processed_image, index=0)
     self.__updateFrameRate()
 
     QtCore.QTimer.singleShot(1, self.__captureFrame)
@@ -99,28 +99,30 @@ class Game(GUI):
     image = Image.open(out)
     return cv2.cvtColor(np.asarray(image), cv2.COLOR_BGR2RGB)
 
-  # def __didCaptureFrame(self, frame, camera):
-  #   """
-  #   Camera frame delegate
-  #   """
-  #   img = self.__running_calibration.applyMapping(frame)
+  def __keyPressEvent(self, e):
+    if type(e) == QtGui.QKeyEvent:
+      if e.key() == QtCore.Qt.Key_Return or e.key() == QtCore.Qt.Key_Enter:
+        self.__runScan()
+      e.accept()
+    else:
+      e.ignore()
 
-  #   key_pressed = cv2.waitKey(1)
-  #   if key_pressed & 0xFF == ord('q'):
-  #     camera.stopRunning()
-  #   elif key_pressed == 13: # Enter(13)
-  #     squares = self.__board.scan(img)
-  #     board_state = self.__board.toMatrix(squares)
-  #     human_move = self.__agent.state2Move(board_state)
-  #     if human_move is not None:
-  #       self.__agent.makeMove(human_move)
-  #       self.__agent.updateState(board_state)
+  def __runScan(self):
+    squares = self.__board.scan(self.__processed_image)
+    board_state = self.__board.toMatrix(squares)
 
-  #     cpu_move = self.__agent.chooseMove()
-  #     if cpu_move is not None:
-  #       self.__agent.makeMove(cpu_move)
-  #       self.__agent.updateState(self.__agent.board.state())
+    # After scanning the processed image will have bounding boxes added
+    scaned_image = cv2.cvtColor(self.__processed_image, cv2.COLOR_RGB2BGR)
+    self.setImage(scaned_image, index=1)
 
-  #   virtualBoardImage = self.__toPNGImage()
-  #   img = np.hstack((img, virtualBoardImage)) # np.hstack tem um performance bem ruim :(
-  #   cv2.imshow('chess board computer vision', img)
+    human_move = self.__agent.state2Move(board_state)
+    if human_move is not None:
+      self.setConsoleText('HUMAN: {}'.format(human_move.uci()))
+      self.__agent.makeMove(human_move)
+      self.__agent.updateState(board_state)
+
+    cpu_move = self.__agent.chooseMove()
+    if cpu_move is not None:
+      self.setConsoleText('BOT: {}'.format(cpu_move.uci()))
+      self.__agent.makeMove(cpu_move)
+      self.__agent.updateState(self.__agent.board.state())

@@ -20,7 +20,9 @@ args = vars(parser.parse_args())
 if __name__ == "__main__":
   # calibration mapping
   if args['mapping']:
-    Game().mapping()
+    app = QtGui.QApplication(sys.argv)
+    game = Game()
+    game.mapping()
 
   # start a game
   if args['start']:
