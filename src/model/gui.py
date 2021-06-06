@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Tuple
 from pyqtgraph.Qt import QtCore, QtGui
 
 import pyqtgraph as pg
