@@ -108,12 +108,11 @@ class Game(GUI):
       e.ignore()
 
   def __runScan(self):
-    squares = self.__board.scan(self.__processed_image)
+    squares, detections = self.__board.scan(self.__processed_image)
     board_state = self.__board.toMatrix(squares)
 
-    # After scanning the processed image will have bounding boxes added
-    scaned_image = cv2.cvtColor(self.__processed_image, cv2.COLOR_RGB2BGR)
-    self.setImage(scaned_image, index=1)
+    cvImage = self.__cvPredictionImage(self.__processed_image.copy(), detections)
+    self.setImage(cvImage, index=1)
 
     human_move = self.__agent.state2Move(board_state)
     if human_move is not None:
@@ -126,3 +125,20 @@ class Game(GUI):
       self.setConsoleText('BOT: {}'.format(cpu_move.uci()))
       self.__agent.makeMove(cpu_move)
       self.__agent.updateState(self.__agent.board.state())
+
+  def __cvPredictionImage(self, src, detections: list) -> np.array:
+    rgb = cv2.cvtColor(src, cv2.COLOR_BGR2RGB)
+    inverted = cv2.bitwise_not(rgb)
+    color_map = cv2.applyColorMap(inverted, cv2.COLORMAP_TWILIGHT)
+    gray = cv2.cvtColor(color_map, cv2.COLOR_RGB2GRAY)
+    return gray
+
+  def __drawBoundingBoxes(self, src, detections: list) -> np.array:
+    COLORS = np.random.randint(0, 255, size=(12, 3), dtype="uint8")
+
+    for (_, bounding_box, _, class_id) in detections:
+      color = [int(c) for c in COLORS[class_id]]
+      x,y,w,h = bounding_box
+      cv2.rectangle(src, (x, y), (w, h), color, 2)
+      cv2.putText(src, str(class_id), (x + 5, y + 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+    return src

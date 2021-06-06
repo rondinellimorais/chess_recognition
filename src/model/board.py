@@ -57,7 +57,7 @@ class Board:
     A list of `Square` with position of each piece on image
     """
     # previews all image classes
-    detections = self.network.predict(img=img, size=(640, 640), thresh=0.9, draw_and_save=True)
+    detections = self.network.predict(img=img, size=(640, 640), thresh=0.9, draw_and_save=False)
 
     self.resetState()
 
@@ -78,7 +78,7 @@ class Board:
           if area is not None and area > minArea and area > old_area:
             square.createPiece(name, accuracy, classID)
 
-    return self.squares
+    return (self.squares, detections)
 
   def resetState(self):
     """
