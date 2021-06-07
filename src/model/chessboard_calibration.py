@@ -32,7 +32,7 @@ class ChessboardCalibration(Debugable):
   smooth_ksize: tuple
 
   __out_size: tuple = (640, 640)
-  __padding_val: tuple = (8, 8)
+  __padding_val: tuple = (15, 20)
   __matrix: list
 
   def __init__(self, debug=False):

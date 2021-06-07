@@ -68,7 +68,7 @@ class Game(GUI):
     chessboard_calibration = ChessboardCalibration(debug=True)
     chessboard_calibration.mapping(
       chessboard_img=frame,
-      fix_rotate=False,
+      fix_rotate=True,
       rotate_val=90,
       add_padding=True
     )
@@ -89,8 +89,9 @@ class Game(GUI):
     if not found:
       raise Exception('No mapping found. Run calibration mapping')
 
-    self.__captureFrame()
     self.setKeyPressEvent(self.__keyPressEvent)
+    self.__captureFrame()
+    self.__runScan(only_prediction=True)
     self.show()
 
   def __captureFrame(self):
@@ -128,7 +129,7 @@ class Game(GUI):
     else:
       e.ignore()
 
-  def __runScan(self):
+  def __runScan(self, only_prediction: bool = False):
     squares, detections = self.__board.scan(self.__processed_image)
     board_state = self.__board.toMatrix(squares)
 
@@ -141,17 +142,18 @@ class Game(GUI):
       symbols=SYMBOLS
     )
 
-    human_move = self.__agent.state2Move(board_state)
-    if human_move is not None:
-      self.print('HUMAN: {}'.format(human_move.uci()))
-      self.__agent.makeMove(human_move)
-      self.__agent.updateState(board_state)
+    if not only_prediction:
+      human_move = self.__agent.state2Move(board_state)
+      if human_move is not None:
+        self.print('HUMAN: {}'.format(human_move.uci()))
+        self.__agent.makeMove(human_move)
+        self.__agent.updateState(board_state)
 
-    cpu_move = self.__agent.chooseMove()
-    if cpu_move is not None:
-      self.print('BOT: {}'.format(cpu_move.uci()))
-      self.__agent.makeMove(cpu_move)
-      self.__agent.updateState(self.__agent.board.state())
+      cpu_move = self.__agent.chooseMove()
+      if cpu_move is not None:
+        self.print('BOT: {}'.format(cpu_move.uci()))
+        self.__agent.makeMove(cpu_move)
+        self.__agent.updateState(self.__agent.board.state())
 
   def __cvPredictionImage(self, src) -> np.array:
     rgb = cv2.cvtColor(src, cv2.COLOR_BGR2RGB)
