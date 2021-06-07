@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Dict, Optional
 import numpy as np
 from pyqtgraph.Qt import QtCore, QtGui
 
@@ -43,7 +43,7 @@ class GUI(QtGui.QMainWindow):
     self.__createConsole()
 
     ## define tool tip settings
-    QtGui.QToolTip.setFont(QtGui.QFont('Helvetica', 16))
+    QtGui.QToolTip.setFont(QtGui.QFont('Helvetica', 18))
 
   def __addGridLayout(self, numrows: int, numcols: int) -> list[pg.ViewBox]:
     for r in range(numrows):
@@ -98,7 +98,7 @@ class GUI(QtGui.QMainWindow):
     """
     self.__canvas.show()
 
-  def addBoundingBoxes(self, detections: list, viewIndex: int = 0, class_colors: list = []):
+  def addBoundingBoxes(self, detections: list, viewIndex: int = 0, class_colors: list = [], symbols: Dict = None):
     parent: pg.ViewBox = self.__views[viewIndex]
     self.__removeBoundingBoxes(parent)
     for (name, bounding_box, accuracy, class_id) in detections:
@@ -112,5 +112,5 @@ class GUI(QtGui.QMainWindow):
       box.setGeometry(x, y, w-x, h-y)
       box.setZValue(1)
       box.setBorder(pg.mkPen(color, width=6))
-      box.setToolTip('{}\naccuracy: {:.2f}%'.format(name, accuracy * 100))
+      box.setToolTip('{}\n{}\naccuracy: {:.2f}%'.format(symbols[class_id], name, accuracy * 100))
       self.__bounding_boxes.append(box)

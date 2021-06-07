@@ -1,4 +1,6 @@
 from typing import Dict
+
+from pyqtgraph.graphicsItems.ScatterPlotItem import Symbols
 from model.chessboard_calibration import ChessboardCalibration
 from model.board import Board
 from model.agent import Agent
@@ -16,9 +18,24 @@ import chess.svg
 import cairosvg
 import time
 
-# TODO: O size aqui está 12 fixo, 12 é a quantidade de 
-# classes no arquivos darknet.names
-COLORS = np.random.randint(0, 255, size=(12, 3), dtype="uint8")
+# indexes do arquivos darknet.names
+SYMBOLS = {
+  0: "♙",
+  1: "♖",
+  2: "♗",
+  3: "♘",
+  4: "♔",
+  5: "♕",
+  6: "♟",
+  7: "♜",
+  8: "♝",
+  9: "♚",
+  10: "♛",
+  11: "♞"
+}
+
+# colors constants
+COLORS = np.random.randint(0, 255, size=(len(SYMBOLS), 3), dtype="uint8")
 
 class Game(GUI):
   __cam_address: str
@@ -117,7 +134,12 @@ class Game(GUI):
 
     cvImage = self.__cvPredictionImage(self.__processed_image.copy())
     self.setImage(cvImage, index=1)
-    self.addBoundingBoxes(detections, viewIndex=1, class_colors=COLORS)
+    self.addBoundingBoxes(
+      detections,
+      viewIndex=1,
+      class_colors=COLORS,
+      symbols=SYMBOLS
+    )
 
     human_move = self.__agent.state2Move(board_state)
     if human_move is not None:
