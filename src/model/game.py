@@ -16,6 +16,10 @@ import chess.svg
 import cairosvg
 import time
 
+# TODO: O size aqui está 12 fixo, 12 é a quantidade de 
+# classes no arquivos darknet.names
+COLORS = np.random.randint(0, 255, size=(12, 3), dtype="uint8")
+
 class Game(GUI):
   __cam_address: str
   __running_calibration: ChessboardCalibration
@@ -90,7 +94,7 @@ class Game(GUI):
     fps2 = 1.0 / dt
     self.__lastupdate = now
     self.__fps = self.__fps * 0.9 + fps2 * 0.1
-    self.setConsoleText('Mean Frame Rate:  {:.2f} FPS'.format(self.__fps), index=0)
+    self.print('Mean Frame Rate:  {:.2f} FPS'.format(self.__fps), index=0)
 
   def __toPNGImage(self):
     out = BytesIO()
@@ -113,17 +117,17 @@ class Game(GUI):
 
     cvImage = self.__cvPredictionImage(self.__processed_image.copy())
     self.setImage(cvImage, index=1)
-    self.addBoundingBoxes(detections, viewIndex=1)
+    self.addBoundingBoxes(detections, viewIndex=1, class_colors=COLORS)
 
     human_move = self.__agent.state2Move(board_state)
     if human_move is not None:
-      self.setConsoleText('HUMAN: {}'.format(human_move.uci()))
+      self.print('HUMAN: {}'.format(human_move.uci()))
       self.__agent.makeMove(human_move)
       self.__agent.updateState(board_state)
 
     cpu_move = self.__agent.chooseMove()
     if cpu_move is not None:
-      self.setConsoleText('BOT: {}'.format(cpu_move.uci()))
+      self.print('BOT: {}'.format(cpu_move.uci()))
       self.__agent.makeMove(cpu_move)
       self.__agent.updateState(self.__agent.board.state())
 
