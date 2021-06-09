@@ -18,6 +18,8 @@ import chess.svg
 import cairosvg
 import time
 
+import imutils
+
 # indexes do arquivos darknet.names
 SYMBOLS = {
   0: "♙",
@@ -97,11 +99,107 @@ class Game(GUI):
   def __captureFrame(self):
     frame = self.__camera.capture()
     self.__processed_image = self.__running_calibration.applyMapping(frame)
-    rgb = cv2.cvtColor(self.__processed_image.copy(), cv2.COLOR_BGR2RGB)
-    self.setImage(rgb, index=0)
+    
+    result = self.__addFakeBoundingBoxes()
+    result = cv2.cvtColor(result, cv2.COLOR_BGR2RGB)
+
+    self.setImage(result, index=0)
     self.__updateFrameRate()
 
     QtCore.QTimer.singleShot(1, self.__captureFrame)
+
+  def __addFakeBoundingBoxes(self):
+    # Isso mesmo: fake bounding boxes!!
+    # Esse método gera as caixas fake utilizando rastreamento de cor HSV
+    # Tudo isso para dar a impressão que tudo está acontecendo real time ;)
+
+    # Mais tarde o darknet vai passar e de fato detectar os objetos, até lá
+    # precisamos mostrar algo incrível para o público
+
+    inverted = cv2.bitwise_not(self.__processed_image.copy())
+    hsv = cv2.cvtColor(inverted, cv2.COLOR_BGR2HSV)
+
+    # ========
+    # eliminar as casas
+    # ========
+
+    # ---- verdes
+    lower = np.array([135, 6, 91])
+    upper = np.array([255, 255, 255])
+    mask = cv2.inRange(hsv.copy(), lower, upper)
+    mask = 255-mask
+    green_squares_mask = mask.copy()
+
+    # ---- brancas
+    hsv = cv2.cvtColor(self.__processed_image.copy(), cv2.COLOR_BGR2HSV)
+    lower = np.array([0, 0, 81])
+    upper = np.array([255, 43, 255])
+    mask = cv2.inRange(hsv.copy(), lower, upper)
+    mask = 255-mask
+    white_squares_mask = mask.copy()
+
+
+    # ---- resultado final sem as casas
+    image_final = self.__processed_image.copy()
+    image_final = cv2.bitwise_and(image_final, image_final, mask=green_squares_mask)
+    image_final = cv2.bitwise_and(image_final, image_final, mask=white_squares_mask)
+
+
+    # ========
+    # Selecionar as peças
+    # ========
+    inverted = cv2.bitwise_not(image_final.copy())
+    hsv = cv2.cvtColor(inverted, cv2.COLOR_BGR2HSV)
+
+    # ---- peças brancas
+    lower = np.array([76, 87, 50])
+    upper = np.array([255, 255, 255])
+    mask = cv2.inRange(hsv.copy(), lower, upper)
+    res = cv2.bitwise_and(image_final, image_final, mask=mask)
+
+    target = self.__processed_image.copy()
+    self.drawContours(res, target, (0, 255, 0))
+
+    # ---- peças pretas
+    lower = np.array([0, 0, 159])
+    upper = np.array([55, 255, 255])
+    mask = cv2.inRange(hsv.copy(), lower, upper)
+    res = cv2.bitwise_and(image_final, image_final, mask=mask)
+    self.drawContours(res, target, (255, 0, 0))
+
+    return target
+
+  def drawContours(self, res, target, color):
+    gray = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
+
+    thresh = cv2.adaptiveThreshold(gray.copy(), 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 3, 2)
+    thresh = cv2.bitwise_not(thresh)
+
+    # find contours
+    cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    cnts = imutils.grab_contours(cnts)
+    cnts = sorted(cnts, key=cv2.contourArea, reverse=True)
+
+    boxes = []
+    confidences = []
+
+    for cnt in cnts:
+      area = cv2.contourArea(cnt)
+      if area > 200:
+        peri = cv2.arcLength(cnt, True)
+        biggest_cnt = cv2.approxPolyDP(cnt, 0.025 * peri, True)
+        x, y, w, h = cv2.boundingRect(biggest_cnt)
+        boxes.append([x, y, int(x+w), int(y+h)])
+        confidences.append(float(0.6))
+
+    # apply non-maxima suppression to suppress weak, overlapping bounding
+    # boxes
+    idxs = cv2.dnn.NMSBoxes(boxes, confidences, 0.35, 0.7)
+    if len(idxs) > 0:
+      for i in idxs.flatten():
+        (x, y) = (boxes[i][0], boxes[i][1])
+        (w, h) = (boxes[i][2], boxes[i][3])
+        cv2.rectangle(target, (x,y), (w, h), color, 2)
 
   def __updateFrameRate(self):
     now = time.time()
