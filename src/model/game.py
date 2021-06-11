@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Tuple
 
 from pyqtgraph.graphicsItems.ScatterPlotItem import Symbols
 from model.chessboard_calibration import ChessboardCalibration
@@ -63,7 +63,7 @@ class Game(GUI):
     """
     Start mapping chess board
     """
-    camera = Camera(self.__cam_address, fps=self.__fps)
+    camera = Camera(self.__cam_address)
     frame = camera.capture()
 
     # do calibration mapping
@@ -138,38 +138,41 @@ class Game(GUI):
     mask = 255-mask
     white_squares_mask = mask.copy()
 
-
     # ---- resultado final sem as casas
     image_final = self.__processed_image.copy()
     image_final = cv2.bitwise_and(image_final, image_final, mask=green_squares_mask)
     image_final = cv2.bitwise_and(image_final, image_final, mask=white_squares_mask)
 
-
     # ========
-    # Selecionar as peças
+    # Seleciona as peças
     # ========
     inverted = cv2.bitwise_not(image_final.copy())
     hsv = cv2.cvtColor(inverted, cv2.COLOR_BGR2HSV)
 
     # ---- peças brancas
+    target = self.__processed_image.copy()
     lower = np.array([76, 87, 50])
     upper = np.array([255, 255, 255])
-    mask = cv2.inRange(hsv.copy(), lower, upper)
-    res = cv2.bitwise_and(image_final, image_final, mask=mask)
-
-    target = self.__processed_image.copy()
-    self.drawContours(res, target, (0, 255, 0))
+    white_pieces_mask = cv2.inRange(hsv.copy(), lower, upper)
 
     # ---- peças pretas
     lower = np.array([0, 0, 159])
     upper = np.array([55, 255, 255])
-    mask = cv2.inRange(hsv.copy(), lower, upper)
-    res = cv2.bitwise_and(image_final, image_final, mask=mask)
-    self.drawContours(res, target, (255, 0, 0))
+    black_pieces_mask = cv2.inRange(hsv.copy(), lower, upper)
+
+    hand_is_detected, hand_contours = self.__hand_detected(image_final, white_pieces_mask, black_pieces_mask)
+    if hand_is_detected:
+      self.__drawHand(target, hand_contours)
+    else:
+      res = cv2.bitwise_and(image_final, image_final, mask=white_pieces_mask)
+      self.drawPiecesBoundingBoxes(res, target, (0, 255, 0))
+
+      res = cv2.bitwise_and(image_final, image_final, mask=black_pieces_mask)
+      self.drawPiecesBoundingBoxes(res, target, (255, 0, 0))
 
     return target
 
-  def drawContours(self, res, target, color):
+  def drawPiecesBoundingBoxes(self, res, target, color):
     gray = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
 
     thresh = cv2.adaptiveThreshold(gray.copy(), 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 3, 2)
@@ -200,6 +203,41 @@ class Game(GUI):
         (x, y) = (boxes[i][0], boxes[i][1])
         (w, h) = (boxes[i][2], boxes[i][3])
         cv2.rectangle(target, (x,y), (w, h), color, 2)
+
+  def __drawHand(self, target, hand_contours):
+    peri = cv2.arcLength(hand_contours, True)
+    biggest_cnt = cv2.approxPolyDP(hand_contours, 0.015 * peri, True)
+    x, y, w, h = cv2.boundingRect(biggest_cnt)
+    cv2.rectangle(target, (x,y), (x+w, y+h), (0, 0, 255), 2)
+    cv2.putText(target, 'HUMAN HAND', (x, y - 10 ), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+
+  def __hand_detected(self, no_houses_frame, white_pieces_mask, black_pieces_mask) -> Tuple[bool, list]:
+    """
+    return `True` or `False` if hand is detected
+    """
+    white_pieces_mask = 255-white_pieces_mask
+    black_pieces_mask = 255-black_pieces_mask
+
+    no_houses_frame = cv2.bitwise_and(no_houses_frame, no_houses_frame, mask=white_pieces_mask)
+    no_houses_frame = cv2.bitwise_and(no_houses_frame, no_houses_frame, mask=black_pieces_mask)
+
+    # convert image to gray scale
+    gray = cv2.cvtColor(no_houses_frame, cv2.COLOR_BGR2GRAY)
+
+    # This is the threshold level for every pixel.
+    thresh = cv2.threshold(gray, 30, 255, cv2.THRESH_BINARY)[1]
+    thresh = cv2.erode(thresh, None, iterations=8)
+
+    cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    cnts = imutils.grab_contours(cnts)
+
+    if cnts is not None and len(cnts) > 0:
+      # Estou assumindo que a coisa maior na imagem diferente das casas e das peças
+      # é uma mão, mas isso não é uma vdd absoluta.
+      cnt = max(cnts, key=cv2.contourArea)
+      return (True, cnt)
+    else:
+      return (False, None)
 
   def __updateFrameRate(self):
     now = time.time()
