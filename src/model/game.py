@@ -100,10 +100,11 @@ class Game(GUI):
     frame = self.__camera.capture()
     self.__processed_image = self.__running_calibration.applyMapping(frame)
     
-    result = self.__addFakeBoundingBoxes()
-    result = cv2.cvtColor(result, cv2.COLOR_BGR2RGB)
+    # result = self.__addFakeBoundingBoxes()
+    # result = cv2.cvtColor(result, cv2.COLOR_BGR2RGB)
+    # self.setImage(result, index=0)
 
-    self.setImage(result, index=0)
+    self.__runScan(only_prediction=True)
     self.__updateFrameRate()
 
     QtCore.QTimer.singleShot(1, self.__captureFrame)
@@ -269,14 +270,14 @@ class Game(GUI):
     squares, detections = self.__board.scan(self.__processed_image)
     board_state = self.__board.toMatrix(squares)
 
-    cvImage = self.__cvPredictionImage(self.__processed_image.copy())
-    self.setImage(cvImage, index=1)
-    self.addBoundingBoxes(
-      detections,
-      viewIndex=1,
-      class_colors=COLORS,
-      symbols=SYMBOLS
-    )
+    # cvImage = self.__cvPredictionImage(self.__processed_image.copy())
+    self.setImage(self.__processed_image, index=0)
+    # self.addBoundingBoxes(
+    #   detections,
+    #   viewIndex=1,
+    #   class_colors=COLORS,
+    #   symbols=SYMBOLS
+    # )
 
     if not only_prediction:
       human_move = self.__agent.state2Move(board_state)

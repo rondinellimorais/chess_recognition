@@ -14,7 +14,7 @@ import pyqtgraph as pg
 class GUI(QtGui.QMainWindow):
   __canvas: pg.GraphicsLayoutWidget = None
   __layout: pg.GraphicsLayout = None
-  __grid_size = (2, 1)
+  __grid_size = (1, 1)
   __window_size = (640 * __grid_size[0], 640 * __grid_size[1])
   __console_texts: list[str] = []
   __max_buffer_size = 10
@@ -56,7 +56,7 @@ class GUI(QtGui.QMainWindow):
 
   def __createConsole(self):
     self.label = QtGui.QLabel(self.__canvas)
-    self.label.setStyleSheet('QLabel { color: yellow; margin: 10px; font-weight: bold }')
+    self.label.setStyleSheet('QLabel { color: red; margin: 10px; font-weight: bold; font-size: 18px; background-color: white }')
 
   def __showConsoleText(self):
     self.label.setText('\n'.join(self.__console_texts))

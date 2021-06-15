@@ -1,0 +1,51 @@
+name: chess_recognition
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - pip=21.0.1
+  - pyqtgraph=0.12.1
+  - python=3.9.2
+  - pip:
+    - absl-py==0.12.0
+    - attrs==21.2.0
+    - cairocffi==1.2.0
+    - cairosvg==2.5.2
+    - cffi==1.14.5
+    - chess==1.5.0
+    - click==7.1.2
+    - cssselect2==0.4.1
+    - cycler==0.10.0
+    - decorator==4.4.2
+    - defusedxml==0.7.1
+    - imageio==2.9.0
+    - imutils==0.5.3
+    - kiwisolver==1.3.1
+    - matplotlib==3.3.3
+    - networkx==2.5
+    - numpy==1.19.4
+    - opencv-contrib-python==4.5.2.52
+    - opencv-python==4.4.0.46
+    - opencv-python-headless==4.5.1.48
+    - pillow==8.1.2
+    - protobuf==3.17.1
+    - pycparser==2.20
+    - pyparsing==2.4.7
+    - pyqt5==5.15.4
+    - pyqt5-plugins==5.15.4.2.2
+    - pyqt5-qt5==5.15.2
+    - pyqt5-sip==12.9.0
+    - pyqt5-tools==5.15.4.3.2
+    - python-dateutil==2.8.1
+    - python-dotenv==0.17.1
+    - pywavelets==1.1.1
+    - qt5-applications==5.15.2.2.2
+    - qt5-tools==5.15.2.1.2
+    - scikit-image==0.18.1
+    - scipy==1.5.4
+    - shapely==1.7.1
+    - six==1.15.0
+    - tifffile==2021.3.17
+    - tinycss2==1.1.0
+    - webencodings==0.5.1
+prefix: /Users/rondinellimorais/miniconda3/envs/chess_recognition
