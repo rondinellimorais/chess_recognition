@@ -57,7 +57,7 @@ class Board:
     A list of `Square` with position of each piece on image
     """
     # previews all image classes
-    detections = self.network.predict(img=img, size=(640, 640), thresh=0.9, draw_and_save=True)
+    detections = self.network.predict(img=img, size=(416, 416), thresh=0.9, draw_and_save=True)
 
     self.resetState()
 

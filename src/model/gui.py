@@ -15,7 +15,7 @@ class GUI(QtGui.QMainWindow):
   __canvas: pg.GraphicsLayoutWidget = None
   __layout: pg.GraphicsLayout = None
   __grid_size = (1, 1)
-  __window_size = (640 * __grid_size[0], 640 * __grid_size[1])
+  __window_size = (416 * __grid_size[0], 416 * __grid_size[1])
   __console_texts: list[str] = []
   __max_buffer_size = 10
   __views: list[pg.ViewBox] = []
