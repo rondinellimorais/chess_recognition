@@ -29,3 +29,26 @@ python3 src/main.py --mapping
 ```bash
 python3 src/main.py --mapping
 ```
+
+# Troubleshooting
+
+## Could not load the Qt platform plugin "xcb"
+
+```
+qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "" even though it was found.
+This application failed to start because no Qt platform plugin could be initialized. Reinstalling the application may fix this problem.
+
+Available platform plugins are: eglfs, linuxfb, minimal, minimalegl, offscreen, vnc, xcb.
+
+Aborted (core dumped)
+```
+
+**Resolution**
+
+Just remove the damn
+
+```
+~/miniconda3/envs/envname/lib/python-3.9/site-packages/cv2/qt/plugins
+```
+
+https://github.com/wkentaro/labelme/issues/842#issuecomment-826481652

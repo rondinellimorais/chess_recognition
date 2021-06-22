@@ -15,6 +15,10 @@ class Darknet:
 
     # load model
     self.__net = readNetFromDarknet(config.get('CFG_FILE_PATH'), config.get('WEIGHTS_FILE_PATH'))
+    
+    # only GPU
+    # self.__net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
+    # self.__net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
 
     # determine only the *output* layer names that we need from YOLO
     self.__out_layers = self.__net.getLayerNames()

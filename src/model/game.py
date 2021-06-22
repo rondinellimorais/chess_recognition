@@ -102,7 +102,6 @@ class Game(GUI):
     
     result = self.__addFakeBoundingBoxes()
     result = cv2.cvtColor(result, cv2.COLOR_BGR2RGB)
-
     self.setImage(result, index=0)
     self.__updateFrameRate()
 
