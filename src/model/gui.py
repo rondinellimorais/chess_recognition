@@ -14,13 +14,12 @@ import pyqtgraph as pg
 class GUI(QtGui.QMainWindow):
   __canvas: pg.GraphicsLayoutWidget = None
   __layout: pg.GraphicsLayout = None
-  __grid_size = (2, 1)
-  __window_size = (416 * __grid_size[0], 416 * __grid_size[1])
+  __window_size = (416, 416)
   __console_texts: list[str] = []
   __max_buffer_size = 10
-  __views: list[pg.ViewBox] = []
+  __view: pg.ViewBox = None
   __bounding_boxes: list[pg.ViewBox] = []
-  __image_items: list[pg.ImageItem] = None
+  __image_item: pg.ImageItem = None
 
   def __init__(self, title: str = 'preview'):
     super(GUI, self).__init__(parent=None)
@@ -31,28 +30,20 @@ class GUI(QtGui.QMainWindow):
     self.__layout.setContentsMargins(0, 0, 0, 0)
     self.__canvas.setCentralItem(self.__layout)
 
-    ## add image grid
-    self.__image_items:list[pg.ImageItem] = []
-    self.__addGridLayout(numrows=self.__grid_size[1], numcols=self.__grid_size[0])
-    for view in self.__views:
-      imgItem = pg.ImageItem(axisOrder='row-major')
-      self.__image_items.append(imgItem)
-      view.addItem(imgItem)
+    ## add view and image
+    self.__view = pg.ViewBox(enableMouse=False)
+    self.__view.suggestPadding = lambda *_: 0.0
+    self.__view.invertY()
+    self.__layout.addItem(self.__view)
+
+    self.__image_item = pg.ImageItem(axisOrder='row-major')
+    self.__view.addItem(self.__image_item)
 
     ## setup console log
     self.__createConsole()
 
     ## define tool tip settings
     QtGui.QToolTip.setFont(QtGui.QFont('Helvetica', 18))
-
-  def __addGridLayout(self, numrows: int, numcols: int) -> list[pg.ViewBox]:
-    for r in range(numrows):
-      for c in range(numcols):
-        view = pg.ViewBox(enableMouse=False)
-        view.suggestPadding = lambda *_: 0.0
-        view.invertY()
-        self.__views.append(view)
-        self.__layout.addItem(view, row=r, col=c)
 
   def __createConsole(self):
     self.label = QtGui.QLabel(self.__canvas)
@@ -67,13 +58,8 @@ class GUI(QtGui.QMainWindow):
       if box.scene() is not None:
         parent.removeItem(box)
 
-  def setImage(self, img, index=None):
-    if index is not None:
-      imgItem = self.__image_items[index]
-      imgItem.setImage(img)
-    else:
-      for imgItem in self.__image_items:
-        imgItem.setImage(img)
+  def setImage(self, img):
+    self.__image_item.setImage(img)
 
   def setKeyPressEvent(self, callback):
     if callback is not None:
@@ -98,15 +84,14 @@ class GUI(QtGui.QMainWindow):
     """
     self.__canvas.show()
 
-  def addBoundingBoxes(self, detections: list, viewIndex: int = 0, class_colors: list = [], symbols: Dict = None):
-    parent: pg.ViewBox = self.__views[viewIndex]
-    self.__removeBoundingBoxes(parent)
+  def addBoundingBoxes(self, detections: list, class_colors: list = [], symbols: Dict = None):
+    self.__removeBoundingBoxes(self.__view)
     for (name, bounding_box, accuracy, class_id) in detections:
       color = [int(c) for c in class_colors[class_id]]
       x,y,w,h = bounding_box
 
       box = pg.ViewBox(
-        parent=parent,
+        parent=self.__view,
         border='r'
       )
       box.setGeometry(x, y, w-x, h-y)
