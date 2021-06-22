@@ -5,7 +5,7 @@ from utils import random_color
 class Debugable:
   def __init__(self, debug=False):
     self.debug = debug
-    self.default_path = os.path.join('/home/rondinellimorais/chess_recognition/debug')
+    self.default_path = os.path.join('/Users/rondinellimorais/Desktop/projetos/chess_recognition/debug')
     if not os.path.exists(self.default_path):
       os.mkdir(self.default_path)
 
