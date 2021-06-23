@@ -1,5 +1,11 @@
-from typing import Tuple
 import cv2
+import numpy as np
+import imutils
+import json
+import os
+import sys
+
+from typing import Dict, Tuple
 from utils import (
   perspective_transform,
   rotate_image,
@@ -13,11 +19,7 @@ from utils import (
 from model.board import Board
 from model.debugable import Debugable
 from model.square import Square
-import numpy as np
-import imutils
-import json
-import os
-import sys
+from dotenv import dotenv_values
 
 class ChessboardCalibration(Debugable):
   """
@@ -31,13 +33,18 @@ class ChessboardCalibration(Debugable):
   rotate_val: int
   smooth_ksize: tuple
 
-  __out_size: tuple = (480, 480)
+  __out_size: tuple = None
   __padding_val: tuple = (15, 20)
   __matrix: list
 
   def __init__(self, debug=False):
     super().__init__(debug=debug)
     self.board = Board()
+    config = dotenv_values()
+
+    res = int(config.get('RESOLUTION'))
+    self.__out_size = (res * 32, res * 32)
+    print('frame resolution: {}'.format(self.__out_size))
   
   def mapping(self, chessboard_img=None, fix_rotate=False, rotate_val=-90, add_padding=False, apply_kdilate=True, smooth_ksize=(11, 11)):
     """

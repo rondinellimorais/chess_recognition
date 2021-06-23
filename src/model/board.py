@@ -1,15 +1,22 @@
+import numpy as np
+
+from typing import Dict
 from model.square import Square
 from model.darknet import Darknet
 from enumeration import Color
 from utils import intersect_area
 from shapely.geometry import box
-import numpy as np
+from dotenv import dotenv_values
 
 class Board:
   contours: list = None
   squares: list[Square] = None
   network: Darknet = Darknet.instance()
   __squaresAverage: int
+  __config: Dict = None
+
+  def __init__(self) -> None:
+    self.__config = dotenv_values()
 
   def colorBuild(self):
     """
@@ -57,7 +64,9 @@ class Board:
     A list of `Square` with position of each piece on image
     """
     # previews all image classes
-    detections = self.network.predict(img=img, thresh=0.9)
+    thresh = float(self.__config.get('PREDICTION_THRESHOLD'))
+    res = int(self.__config.get('RESOLUTION'))
+    detections = self.network.predict(img=img, size=(res * 32, res * 32), thresh=thresh)
 
     self.resetState()
 
