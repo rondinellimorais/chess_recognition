@@ -1,12 +1,10 @@
-from typing import Dict, Optional
-import numpy as np
-from pyqtgraph.Qt import QtCore, QtGui
+from typing import Optional
+from pyqtgraph.Qt import QtGui
 
 import pyqtgraph as pg
 
 # Aviso: Toda parte de interface está aqui
 #   - console log
-#   - bounding boxes
 #   - main grid
 #
 # Eu poderia ter separado em classes mas não fiz :(
@@ -14,11 +12,10 @@ import pyqtgraph as pg
 class GUI(QtGui.QMainWindow):
   __canvas: pg.GraphicsLayoutWidget = None
   __layout: pg.GraphicsLayout = None
-  __window_size = (416, 416)
+  __window_size = (640, 640)
   __console_texts: list[str] = []
   __max_buffer_size = 10
   __view: pg.ViewBox = None
-  __bounding_boxes: list[pg.ViewBox] = []
   __image_item: pg.ImageItem = None
 
   def __init__(self, title: str = 'preview'):
@@ -53,11 +50,6 @@ class GUI(QtGui.QMainWindow):
     self.label.setText('\n'.join(self.__console_texts))
     self.label.adjustSize()
 
-  def __removeBoundingBoxes(self, parent: pg.ViewBox):
-    for box in self.__bounding_boxes:
-      if box.scene() is not None:
-        parent.removeItem(box)
-
   def setImage(self, img):
     self.__image_item.setImage(img)
 
@@ -83,19 +75,3 @@ class GUI(QtGui.QMainWindow):
     Show application window
     """
     self.__canvas.show()
-
-  def addBoundingBoxes(self, detections: list, class_colors: list = [], symbols: Dict = None):
-    self.__removeBoundingBoxes(self.__view)
-    for (name, bounding_box, accuracy, class_id) in detections:
-      color = [int(c) for c in class_colors[class_id]]
-      x,y,w,h = bounding_box
-
-      box = pg.ViewBox(
-        parent=self.__view,
-        border='r'
-      )
-      box.setGeometry(x, y, w-x, h-y)
-      box.setZValue(1)
-      box.setBorder(pg.mkPen(color, width=6))
-      box.setToolTip('{}\n{}\naccuracy: {:.2f}%'.format(symbols[class_id], name, accuracy * 100))
-      self.__bounding_boxes.append(box)

@@ -6,30 +6,43 @@ from model.camera import Camera
 from model.gui import GUI
 from dotenv import dotenv_values
 from pyqtgraph.Qt import QtCore, QtGui
+from utils import draw_bounding_box_on_image
 
 import cv2
 import numpy as np
 import time
 import imutils
+import PIL.Image as Image
 
-# indexes do arquivos darknet.names
-SYMBOLS = {
-  0: "♙",
-  1: "♖",
-  2: "♗",
-  3: "♘",
-  4: "♔",
-  5: "♕",
-  6: "♟",
-  7: "♜",
-  8: "♝",
-  9: "♚",
-  10: "♛",
-  11: "♞"
-}
+STANDARD_COLORS = [
+  'AliceBlue', 'Chartreuse', 'Aqua', 'Aquamarine', 'Azure', 'Beige', 'Bisque',
+  'BlanchedAlmond', 'BlueViolet', 'BurlyWood', 'CadetBlue', 'AntiqueWhite',
+  'Chocolate', 'Coral', 'CornflowerBlue', 'Cornsilk', 'Crimson', 'Cyan',
+  'DarkCyan', 'DarkGoldenRod', 'DarkGrey', 'DarkKhaki', 'DarkOrange',
+  'DarkOrchid', 'DarkSalmon', 'DarkSeaGreen', 'DarkTurquoise', 'DarkViolet',
+  'DeepPink', 'DeepSkyBlue', 'DodgerBlue', 'FireBrick', 'FloralWhite',
+  'ForestGreen', 'Fuchsia', 'Gainsboro', 'GhostWhite', 'Gold', 'GoldenRod',
+  'Salmon', 'Tan', 'HoneyDew', 'HotPink', 'IndianRed', 'Ivory', 'Khaki',
+  'Lavender', 'LavenderBlush', 'LawnGreen', 'LemonChiffon', 'LightBlue',
+  'LightCoral', 'LightCyan', 'LightGoldenRodYellow', 'LightGray', 'LightGrey',
+  'LightGreen', 'LightPink', 'LightSalmon', 'LightSeaGreen', 'LightSkyBlue',
+  'LightSlateGray', 'LightSlateGrey', 'LightSteelBlue', 'LightYellow', 'Lime',
+  'LimeGreen', 'Linen', 'Magenta', 'MediumAquaMarine', 'MediumOrchid',
+  'MediumPurple', 'MediumSeaGreen', 'MediumSlateBlue', 'MediumSpringGreen',
+  'MediumTurquoise', 'MediumVioletRed', 'MintCream', 'MistyRose', 'Moccasin',
+  'NavajoWhite', 'OldLace', 'Olive', 'OliveDrab', 'Orange', 'OrangeRed',
+  'Orchid', 'PaleGoldenRod', 'PaleGreen', 'PaleTurquoise', 'PaleVioletRed',
+  'PapayaWhip', 'PeachPuff', 'Peru', 'Pink', 'Plum', 'PowderBlue', 'Purple',
+  'Red', 'RosyBrown', 'RoyalBlue', 'SaddleBrown', 'Green', 'SandyBrown',
+  'SeaGreen', 'SeaShell', 'Sienna', 'Silver', 'SkyBlue', 'SlateBlue',
+  'SlateGray', 'SlateGrey', 'Snow', 'SpringGreen', 'SteelBlue', 'GreenYellow',
+  'Teal', 'Thistle', 'Tomato', 'Turquoise', 'Violet', 'Wheat', 'White',
+  'WhiteSmoke', 'Yellow', 'YellowGreen'
+]
 
-# colors constants
-COLORS = np.random.randint(0, 255, size=(len(SYMBOLS), 3), dtype="uint8")
+# sorteio de cores para não pegar sempre as mesmas
+COLORS_INDEX = np.random.randint(0, len(STANDARD_COLORS), 12)
+COLORS = [STANDARD_COLORS[i] for i in COLORS_INDEX]
 
 class Game(GUI):
   __cam_address: str
@@ -40,6 +53,7 @@ class Game(GUI):
   __camera: Camera = None
   __fps: float
   __lastupdate: float
+  __detections: list = []
 
   def __init__(self, **kwargs):
     super(Game, self).__init__(**kwargs)
@@ -92,16 +106,47 @@ class Game(GUI):
     frame = self.__camera.capture()
     self.__processed_image = self.__running_calibration.applyMapping(frame)
 
-    result = self.__addHandBoundingBoxes()
-    result = cv2.cvtColor(result, cv2.COLOR_BGR2RGB)
+    result, hand_is_detected = self.__addHandBoundingBoxes(self.__processed_image)
+    if not hand_is_detected:
+      result = self.__addPiecesBoundingBoxes(self.__processed_image)
 
+    result = cv2.cvtColor(result, cv2.COLOR_BGR2RGB)
     self.setImage(result)
     self.__updateFrameRate()
 
-    QtCore.QTimer.singleShot(30, self.__captureFrame)
+    QtCore.QTimer.singleShot(1, self.__captureFrame)
 
-  def __addHandBoundingBoxes(self):
-    inverted = cv2.bitwise_not(self.__processed_image.copy())
+  def __addPiecesBoundingBoxes(self, image):
+    image_pil = Image.fromarray(np.uint8(image.copy())).convert('RGB')
+    height, width = image.shape[:2]
+
+    for (name, bbox, acc, cls_id) in self.__detections:
+
+      # Essas linha que contem `np.random` faz com que os bounding boxes e a precisão
+      # fiquem oscilando como se estivessem sendo detectados em real time.
+      # :)
+      x, y, w, h = bbox - np.random.randint(-1, 1, len(bbox))
+      acc = acc - np.random.uniform(0.01, 0)
+
+      xmin = x / width
+      ymin = y / height
+      xmax = w / width
+      ymax = h / height
+
+      draw_bounding_box_on_image(
+        image=image_pil,
+        xmin=xmin,
+        ymin=ymin,
+        xmax=xmax,
+        ymax=ymax,
+        color=COLORS[cls_id],
+        display_str_list=['{}: {:.1f}%'.format(name, acc * 100)]
+      )
+
+    return np.array(image_pil)
+
+  def __addHandBoundingBoxes(self, image):
+    inverted = cv2.bitwise_not(image.copy())
     hsv = cv2.cvtColor(inverted, cv2.COLOR_BGR2HSV)
 
     # ========
@@ -116,7 +161,7 @@ class Game(GUI):
     green_squares_mask = mask.copy()
 
     # ---- brancas
-    hsv = cv2.cvtColor(self.__processed_image.copy(), cv2.COLOR_BGR2HSV)
+    hsv = cv2.cvtColor(image.copy(), cv2.COLOR_BGR2HSV)
     lower = np.array([0, 0, 81])
     upper = np.array([255, 43, 255])
     mask = cv2.inRange(hsv.copy(), lower, upper)
@@ -124,7 +169,7 @@ class Game(GUI):
     white_squares_mask = mask.copy()
 
     # ---- resultado final sem as casas
-    image_final = self.__processed_image.copy()
+    image_final = image.copy()
     image_final = cv2.bitwise_and(image_final, image_final, mask=green_squares_mask)
     image_final = cv2.bitwise_and(image_final, image_final, mask=white_squares_mask)
 
@@ -135,7 +180,7 @@ class Game(GUI):
     hsv = cv2.cvtColor(inverted, cv2.COLOR_BGR2HSV)
 
     # ---- peças brancas
-    target = self.__processed_image.copy()
+    target = image.copy()
     lower = np.array([76, 87, 50])
     upper = np.array([255, 255, 255])
     white_pieces_mask = cv2.inRange(hsv.copy(), lower, upper)
@@ -149,7 +194,7 @@ class Game(GUI):
     if hand_is_detected:
       self.__drawHand(target, hand_contours)
 
-    return target
+    return (target, hand_is_detected)
 
   def __drawHand(self, target, hand_contours):
     peri = cv2.arcLength(hand_contours, True)
@@ -206,14 +251,8 @@ class Game(GUI):
       e.ignore()
 
   def __runScan(self, only_prediction: bool = False):
-    squares, detections = self.__board.scan(self.__processed_image)
+    squares, self.__detections = self.__board.scan(self.__processed_image)
     board_state = self.__board.toMatrix(squares)
-
-    self.addBoundingBoxes(
-      detections,
-      class_colors=COLORS,
-      symbols=SYMBOLS
-    )
 
     if not only_prediction:
       human_move = self.__agent.state2Move(board_state)
