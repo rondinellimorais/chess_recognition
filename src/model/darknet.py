@@ -40,7 +40,7 @@ class Darknet:
     labels_path = 'assets/dnn/data.names'
     return open(labels_path).read().strip().split('\n')
 
-  def predict(self, img=None, size=(416, 416), thresh=0.35, nms_threshold=0.6) -> list:
+  def predict(self, img=None, size=(480, 480), thresh=0.35, nms_threshold=0.6) -> list:
     """
     Deep neural network predict
 
