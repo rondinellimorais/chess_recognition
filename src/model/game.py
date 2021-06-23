@@ -53,7 +53,8 @@ class Game(GUI):
   __camera: Camera = None
   __fps: float
   __lastupdate: float
-  __detections: list = []
+  __detections: list = None
+  __scan_timer: QtCore.QTimer = None
 
   def __init__(self, **kwargs):
     super(Game, self).__init__(**kwargs)
@@ -97,7 +98,6 @@ class Game(GUI):
     if not found:
       raise Exception('No mapping found. Run calibration mapping')
 
-    self.setKeyPressEvent(self.__keyPressEvent)
     self.__captureFrame()
     self.__runScan(only_prediction=True)
     self.show()
@@ -107,24 +107,41 @@ class Game(GUI):
     self.__processed_image = self.__running_calibration.applyMapping(frame)
 
     result, hand_is_detected = self.__addHandBoundingBoxes(self.__processed_image)
-    if not hand_is_detected:
+    if hand_is_detected:
+      self.__scheduleScan()
+    else:
       result = self.__addPiecesBoundingBoxes(self.__processed_image)
 
     result = cv2.cvtColor(result, cv2.COLOR_BGR2RGB)
     self.setImage(result)
     self.__updateFrameRate()
 
-    QtCore.QTimer.singleShot(1, self.__captureFrame)
+    QtCore.QTimer.singleShot(30, self.__captureFrame)
+
+  def __scheduleScan(self):
+    self.__detections = None
+    if self.__scan_timer is not None:
+      self.__scan_timer.stop()
+
+    self.__scan_timer = QtCore.QTimer(self)
+    self.__scan_timer.timeout.connect(self.__runScan)
+    self.__scan_timer.setSingleShot(True)
+    self.__scan_timer.start(800)
 
   def __addPiecesBoundingBoxes(self, image):
+    if self.__detections is None:
+      return image
+
     image_pil = Image.fromarray(np.uint8(image.copy())).convert('RGB')
     height, width = image.shape[:2]
 
     for (name, bbox, acc, cls_id) in self.__detections:
 
-      # Essas linha que contem `np.random` faz com que os bounding boxes e a precisão
+      # Essas linhas que contem `np.random` faz com que os bounding boxes e a precisão
       # fiquem oscilando como se estivessem sendo detectados em real time.
-      # :)
+      #
+      # A ilusão faz parte do show :)
+      #
       x, y, w, h = bbox - np.random.randint(-1, 1, len(bbox))
       acc = acc - np.random.uniform(0.01, 0)
 
@@ -242,15 +259,8 @@ class Game(GUI):
     self.__fps = self.__fps * 0.9 + fps2 * 0.1
     self.print('Mean Frame Rate:  {:.2f} FPS'.format(self.__fps), index=0)
 
-  def __keyPressEvent(self, e):
-    if type(e) == QtGui.QKeyEvent:
-      if e.key() == QtCore.Qt.Key_Return or e.key() == QtCore.Qt.Key_Enter:
-        self.__runScan()
-      e.accept()
-    else:
-      e.ignore()
-
   def __runScan(self, only_prediction: bool = False):
+    print('scanning...')
     squares, self.__detections = self.__board.scan(self.__processed_image)
     board_state = self.__board.toMatrix(squares)
 

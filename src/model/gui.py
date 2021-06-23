@@ -53,10 +53,6 @@ class GUI(QtGui.QMainWindow):
   def setImage(self, img):
     self.__image_item.setImage(img)
 
-  def setKeyPressEvent(self, callback):
-    if callback is not None:
-      self.__canvas.keyPressEvent = callback
-
   def print(self, text: str = '', index: Optional[int] = None):
     if index is None:
       self.__console_texts.append(text)
