@@ -116,7 +116,7 @@ class Game(GUI):
     self.setImage(result)
     self.__updateFrameRate()
 
-    QtCore.QTimer.singleShot(30, self.__captureFrame)
+    QtCore.QTimer.singleShot(1, self.__captureFrame)
 
   def __scheduleScan(self):
     self.__detections = None
