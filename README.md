@@ -65,9 +65,9 @@ python3 src/main.py --mapping
 
 # Running
 
-[![Youtube](http://img.youtube.com/vi/9dsYuFIf6_c/0.jpg)](https://www.youtube.com/watch?v=9dsYuFIf6_c "Example 1")
+[![Youtube](assets/img/video_1_thumbnail.png)](https://www.youtube.com/watch?v=9dsYuFIf6_c "Assistir no Youtube")
 
-[![Youtube](http://img.youtube.com/vi/3o1dMs6xAT0/0.jpg)](https://www.youtube.com/watch?v=3o1dMs6xAT0 "Example 2")
+[![Youtube](assets/img/video_2_thumbnail.png)](https://www.youtube.com/watch?v=3o1dMs6xAT0 "Assistir no Youtube")
 
 # Troubleshooting
 
