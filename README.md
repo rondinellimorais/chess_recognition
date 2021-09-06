@@ -75,5 +75,5 @@ Just remove the damn
 https://github.com/wkentaro/labelme/issues/842#issuecomment-826481652
 
 # References
-	- https://jsfiddle.net/q76uzxwe/1/
-	- https://www.freecodecamp.org/news/simple-chess-ai-step-by-step-1d55a9266977/
+   - https://jsfiddle.net/q76uzxwe/1/
+   - https://www.freecodecamp.org/news/simple-chess-ai-step-by-step-1d55a9266977/
