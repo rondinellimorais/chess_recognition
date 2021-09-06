@@ -1,8 +1,16 @@
-# Link
-	- https://jsfiddle.net/q76uzxwe/1/
-	- https://www.freecodecamp.org/news/simple-chess-ai-step-by-step-1d55a9266977/
+# Chess piece Recognition
 
-# chess_recognition
+A computer vision project for playing chess.
+
+<div style="display: inline-flex">
+  <img height="350" src="assets/img/hardware.jpeg">
+  <img height="350" src="assets/img/yolo.png">
+</div>
+<div>
+  <img src="assets/img/board_mapping.png">
+</div>
+
+# Get started
 
 Before cloning this repo it depends on the installed `git lfs`
 
@@ -10,11 +18,15 @@ Before cloning this repo it depends on the installed `git lfs`
 brew install git-lfs
 ```
 
-# Get started
-
-Conda environment
+Create conda environment
 
 ```bash
+# macos
+conda env create -f chess_recognition_macos.yml 
+
+# linux
+conda env create -f chess_recognition_linux.yml 
+
 conda activate chess_recognition
 ```
 
@@ -29,6 +41,15 @@ python3 src/main.py --mapping
 ```bash
 python3 src/main.py --mapping
 ```
+
+## Notebooks
+
+| Title     | Description | Link |
+|:----------|:-----------|-----:|
+| Chess Piece Detection | Use [**Darknet**](https://github.com/AlexeyAB/darknet) to detect pieces | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1nrTyy-m-xG6vmG6klsLm1dTlLJYQTnrM) |
+| Game Board Mapping | Find the playable area of the board | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/13r2HiJeB9G4eQP5a9WTQE_NyeiGQHnF6) |
+| Image Data Augmentation | Data augmentation techniques | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1NXRUnvztSCs7IljH8vXqEIIsFF0IPaTH) |
+
 
 # Troubleshooting
 
@@ -52,3 +73,7 @@ Just remove the damn
 ```
 
 https://github.com/wkentaro/labelme/issues/842#issuecomment-826481652
+
+# References
+   - https://jsfiddle.net/q76uzxwe/1/
+   - https://www.freecodecamp.org/news/simple-chess-ai-step-by-step-1d55a9266977/
