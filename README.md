@@ -1,8 +1,4 @@
-# Link
-	- https://jsfiddle.net/q76uzxwe/1/
-	- https://www.freecodecamp.org/news/simple-chess-ai-step-by-step-1d55a9266977/
-
-# chess_recognition
+# Chess piece Recognition
 
 Before cloning this repo it depends on the installed `git lfs`
 
@@ -12,9 +8,15 @@ brew install git-lfs
 
 # Get started
 
-Conda environment
+Create conda environment
 
 ```bash
+# macos
+conda env create -f chess_recognition_macos.yml 
+
+# linux
+conda env create -f chess_recognition_linux.yml 
+
 conda activate chess_recognition
 ```
 
@@ -29,6 +31,15 @@ python3 src/main.py --mapping
 ```bash
 python3 src/main.py --mapping
 ```
+
+## Notebooks
+
+| Title | Link |
+|:----------|------:|
+| Chess Piece Detection | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1nrTyy-m-xG6vmG6klsLm1dTlLJYQTnrM) |
+| Game Board Mapping | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1nrTyy-m-xG6vmG6klsLm1dTlLJYQTnrM) |
+| Image Data Augmentation | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1nrTyy-m-xG6vmG6klsLm1dTlLJYQTnrM) |
+
 
 # Troubleshooting
 
@@ -52,3 +63,7 @@ Just remove the damn
 ```
 
 https://github.com/wkentaro/labelme/issues/842#issuecomment-826481652
+
+# References
+	- https://jsfiddle.net/q76uzxwe/1/
+	- https://www.freecodecamp.org/news/simple-chess-ai-step-by-step-1d55a9266977/
