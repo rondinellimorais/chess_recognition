@@ -50,6 +50,11 @@ python3 src/main.py --mapping
 | Game Board Mapping | Find the playable area of the board | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/13r2HiJeB9G4eQP5a9WTQE_NyeiGQHnF6) |
 | Image Data Augmentation | Data augmentation techniques | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1NXRUnvztSCs7IljH8vXqEIIsFF0IPaTH) |
 
+# Running
+
+[![Youtube](http://img.youtube.com/vi/9dsYuFIf6_c/0.jpg)](https://www.youtube.com/watch?v=9dsYuFIf6_c)
+
+[![Youtube](http://img.youtube.com/vi/3o1dMs6xAT0/0.jpg)](https://www.youtube.com/watch?v=3o1dMs6xAT0)
 
 # Troubleshooting
 
