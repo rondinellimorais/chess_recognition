@@ -2,13 +2,28 @@
 
 A computer vision project for playing chess.
 
-<div style="display: inline-flex">
-  <img height="350" src="assets/img/hardware.jpeg">
-  <img height="350" src="assets/img/yolo.png">
-</div>
-<div>
-  <img src="assets/img/board_mapping.png">
-</div>
+<p><strong>Object Detection</strong></p>
+<!-- <img src="assets/img/hardware.jpeg">
+<img src="assets/img/yolo.png"> -->
+<img style="max-width: 70%" src="assets/img/hardware+yolo.jpeg">
+
+<p>
+  <br/>
+  <strong>Board mapping</strong>
+</p>
+<img src="assets/img/board_mapping.png">
+
+<p>
+  <br/>
+  <strong>Find board coordinates</strong>
+</p>
+<img src="assets/img/find_coordinates.png">
+
+<p>
+  <br/>
+  <strong>Mapped board</strong>
+</p>
+<img src="assets/img/mapped_board.jpeg">
 
 # Get started
 
@@ -52,9 +67,9 @@ python3 src/main.py --mapping
 
 # Running
 
-[![Youtube](assets/img/video_1_thumbnail.png)](https://youtu.be/9dsYuFIf6_c "Assistir no Youtube")
+[![Youtube](http://img.youtube.com/vi/9dsYuFIf6_c/0.jpg)](https://www.youtube.com/watch?v=9dsYuFIf6_c "Example 1")
 
-[![Youtube](assets/img/video_2_thumbnail.png)](https://youtu.be/3o1dMs6xAT0 "Assistir no Youtube")
+[![Youtube](http://img.youtube.com/vi/3o1dMs6xAT0/0.jpg)](https://www.youtube.com/watch?v=3o1dMs6xAT0 "Example 2")
 
 # Troubleshooting
 
