@@ -5,7 +5,7 @@ A computer vision project for playing chess.
 <p><strong>Object Detection</strong></p>
 <!-- <img src="assets/img/hardware.jpeg">
 <img src="assets/img/yolo.png"> -->
-<img style="max-width: 50%" src="assets/img/hardware+yolo.jpeg">
+<img style="max-width: 60%" src="assets/img/hardware+yolo.jpeg">
 
 <p>
   <br/>
