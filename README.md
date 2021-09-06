@@ -1,12 +1,22 @@
 # Chess piece Recognition
 
+A computer vision project for playing chess.
+
+<div style="display: inline-flex">
+  <img height="350" src="assets/img/hardware.jpeg">
+  <img height="350" src="assets/img/yolo.png">
+</div>
+<div>
+  <img src="assets/img/board_mapping.png">
+</div>
+
+# Get started
+
 Before cloning this repo it depends on the installed `git lfs`
 
 ```
 brew install git-lfs
 ```
-
-# Get started
 
 Create conda environment
 
