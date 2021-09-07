@@ -52,7 +52,7 @@ python3 src/main.py --mapping
 ## Start
 
 ```bash
-python3 src/main.py --mapping
+python3 src/main.py --start
 ```
 
 ## Notebooks
