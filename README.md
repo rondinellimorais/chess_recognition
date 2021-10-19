@@ -1,6 +1,8 @@
-# Chess piece Recognition
+# Chess Recognition
 
-A computer vision project for playing chess.
+This project uses computer vision techniques to detect objects on a chessboard. The data are converted into an 8x8 `numpy` matrix which is passed to the `minimax` algorithm to suggest a move.
+
+We use the `Darknet` framework to train the `Yolov4` neural network to detect the pieces and map the board using `OpenCV`
 
 <p><strong>Object Detection</strong></p>
 <img style="max-width: 60%" src="assets/img/hardware+yolo.jpeg">
@@ -22,6 +24,14 @@ A computer vision project for playing chess.
   <strong>Mapped board</strong>
 </p>
 <img src="assets/img/mapped_board.jpeg">
+
+# Notebooks
+
+| Title     | Description | Link |
+|:----------|:-----------|-----:|
+| ♟️ Chess Piece Detection | Use [**Darknet**](https://github.com/AlexeyAB/darknet) to detect pieces | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1nrTyy-m-xG6vmG6klsLm1dTlLJYQTnrM) |
+| 📷 Game Board Mapping | Find the playable area of the board | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/13r2HiJeB9G4eQP5a9WTQE_NyeiGQHnF6) |
+| 🖼️ Image Data Augmentation | Data augmentation techniques | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1NXRUnvztSCs7IljH8vXqEIIsFF0IPaTH) |
 
 # Get started
 
@@ -54,14 +64,6 @@ python3 src/main.py --mapping
 ```bash
 python3 src/main.py --start
 ```
-
-## Notebooks
-
-| Title     | Description | Link |
-|:----------|:-----------|-----:|
-| ♟️ Chess Piece Detection | Use [**Darknet**](https://github.com/AlexeyAB/darknet) to detect pieces | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1nrTyy-m-xG6vmG6klsLm1dTlLJYQTnrM) |
-| 📷 Game Board Mapping | Find the playable area of the board | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/13r2HiJeB9G4eQP5a9WTQE_NyeiGQHnF6) |
-| 🖼️ Image Data Augmentation | Data augmentation techniques | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1NXRUnvztSCs7IljH8vXqEIIsFF0IPaTH) |
 
 # Running
 
