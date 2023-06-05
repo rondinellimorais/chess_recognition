@@ -68,7 +68,8 @@ Some configurations are necessary to run the project:
 
   > 
   > **NOTE**
-  > Keep this value unchanged if you just want to run the example project
+  >
+  > Keep this value unchanged (`cam_example.mp4` file) if you just want to run the example project
   > 
 </details>
 
