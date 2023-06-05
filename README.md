@@ -65,6 +65,11 @@ Some configurations are necessary to run the project:
   |IP | `http://192.168.0.111:4747/video` |
   | device index | `0` (You can select the second camera by passing 1 and so on) |
   | video file | `/path/file.mp4` |
+
+  > 
+  > **NOTE**
+  > Keep this value unchanged if you just want to run the example project
+  > 
 </details>
 
 <details>
