@@ -5,7 +5,17 @@ import time
 import cv2
 import imutils
 import numpy as np
-from model import *
+from model.camera import Camera
+import ffmpeg
+
+def get_writer(output_path = None, size = None, fps = 30):
+  return (
+    ffmpeg
+    .input('pipe:', format='rawvideo', pix_fmt='bgr24', s='%sx%s'%size, r=fps)
+    .output(output_path, pix_fmt='yuv420p', vcodec='libx264', r=fps)
+    .overwrite_output()
+    .run_async(pipe_stdin=True)
+  )
 
 def adjust_gamma(image, gamma=1.0):
   invGamma = 1.0 / gamma
@@ -29,7 +39,7 @@ def drawPiecesBoundingBoxes(res, target, color):
 
   for cnt in cnts:
     area = cv2.contourArea(cnt)
-    if area > 200:
+    if area > 400:
       peri = cv2.arcLength(cnt, True)
       biggest_cnt = cv2.approxPolyDP(cnt, 0.025 * peri, True)
       x, y, w, h = cv2.boundingRect(biggest_cnt)
@@ -38,33 +48,46 @@ def drawPiecesBoundingBoxes(res, target, color):
 
   # apply non-maxima suppression to suppress weak, overlapping bounding
   # boxes
-  idxs = cv2.dnn.NMSBoxes(boxes, confidences, 0.35, 0.7)
+  idxs = cv2.dnn.NMSBoxes(boxes, confidences, 0.35, 0.9)
   if len(idxs) > 0:
     for i in idxs.flatten():
       (x, y) = (boxes[i][0], boxes[i][1])
       (w, h) = (boxes[i][2], boxes[i][3])
       cv2.rectangle(target, (x,y), (w, h), color, 2)
 
-camera = Camera(cam_address='/Volumes/ROND/chess/video/fake_cam.mp4')
-calibration = ChessboardCalibration()
-calibration.loadMapping()
+camera = Camera(cam_address='/Users/rondinellimorais/Downloads/IMG_0368.MOV')
+process = get_writer("output_video.mp4", (702, 1248))
+try:
+  while True:
+    original_frame = camera.capture()
 
+    frame = original_frame.copy()
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-while True:
-  original_frame = camera.capture()
-  original_frame = calibration.applyMapping(original_frame)
+    lower = np.array([
+      103,
+      79,
+      48
+    ])
+    upper = np.array([
+      255,
+      255,
+      255
+    ])
+    mask = cv2.inRange(frame, lower, upper)
+    res = cv2.bitwise_and(frame, frame, mask=mask)
+    cv2.imshow('res', res)
 
-  frame = original_frame.copy()
-  frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) # to RGB
+    drawPiecesBoundingBoxes(res, original_frame, (0,255,0))
+    cv2.imshow('original_frame', original_frame)
+    process.stdin.write(original_frame.tobytes())
 
-  lower = np.array([0, 0, 0])
-  upper = np.array([65, 89, 255])
-  mask = cv2.inRange(frame, lower, upper)
-  res = cv2.bitwise_and(frame, frame, mask=mask)
-  cv2.imshow('res', res)
+    if cv2.waitKey(1) == ord("q"):
+      break
 
-  # drawPiecesBoundingBoxes(res, original_frame, (0,255,0))
-  # cv2.imshow('original_frame', original_frame)
-
-  if cv2.waitKey(1) == ord("q"):
-    break
+  process.stdin.close()
+  process.wait()
+except:
+  print("finalizando video")
+  process.stdin.close()
+  process.wait()

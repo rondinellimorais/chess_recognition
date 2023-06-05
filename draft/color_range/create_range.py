@@ -6,7 +6,7 @@ import imutils
 import numpy as np
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtWidgets, uic, QtCore
-from model import *
+from model.camera import Camera
 import json
 
 app = QtWidgets.QApplication(sys.argv)
@@ -77,14 +77,9 @@ def saveConfig():
   print('saved!')
 imageConfigScreen.saveButton.clicked.connect(saveConfig)
 
-camera = Camera(cam_address='/Volumes/ROND/chess/video/fake_cam.mp4')
-calibration = ChessboardCalibration()
-calibration.loadMapping()
-
-original_frame = camera.capture()
-original_frame = calibration.applyMapping(original_frame)
-
+camera = Camera(cam_address='/Users/rondinellimorais/Downloads/IMG_0368.MOV')
 while True:
+  original_frame = camera.capture()
   frame = original_frame.copy()
 
   # --------
@@ -112,21 +107,32 @@ while True:
 
   # --------
   # HSV image
-  hsvImageCheckBox = imageConfigScreen.hsvImageCheckBox
-  if bool(hsvImageCheckBox.checkState()):
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+  # hsvImageCheckBox = imageConfigScreen.hsvImageCheckBox
+  # if bool(hsvImageCheckBox.checkState()):
+  #   frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+  frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
   # --------
   # inRange
   lhSlider = imageConfigScreen.lhSlider
   lsSlider = imageConfigScreen.lsSlider
   lvSlider = imageConfigScreen.lvSlider
-  lower = np.array([lhSlider.value(), lsSlider.value(), lvSlider.value()])
+  # lower = np.array([lhSlider.value(), lsSlider.value(), lvSlider.value()])
+  lower = np.array([
+    103,
+    79,
+    48
+  ])
 
   uhSlider = imageConfigScreen.uhSlider
   usSlider = imageConfigScreen.usSlider
   uvSlider = imageConfigScreen.uvSlider
-  upper = np.array([uhSlider.value(), usSlider.value(), uvSlider.value()])
+  # upper = np.array([uhSlider.value(), usSlider.value(), uvSlider.value()])
+  upper = np.array([
+    255,
+    255,
+    255
+  ])
   mask = cv2.inRange(frame, lower, upper)
   res = cv2.bitwise_and(frame, frame, mask=mask)
   cv2.imshow("res", res)
