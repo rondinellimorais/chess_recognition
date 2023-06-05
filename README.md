@@ -117,7 +117,7 @@ Some configurations are necessary to run the project:
   Done!
   ```
 
-  Then `chessboard-mapping.json` file must be created in the root of the project.
+  Then `chessboard-mapping.json` file must be created in the root of the project. You can look in the `debug` directory step by step calibration of the board, if you don't want to see those logs anymore set `DEBUG=0` in `.env`
 
   Note that in `.env` we define the camera for an example video file:
   
