@@ -61,6 +61,7 @@ class Game(GUI):
     self.__config = dotenv_values()
     self.__cam_address = self.__config.get('CAM_ADDRESS')
     self.__agent = Agent()
+    self.__debug = bool(int(self.__config.get('DEBUG')))
 
     # frame rate metrics
     self.__fps = 0.
@@ -74,7 +75,7 @@ class Game(GUI):
     frame = camera.capture()
 
     # do calibration mapping
-    chessboard_calibration = ChessboardCalibration(debug=True)
+    chessboard_calibration = ChessboardCalibration(debug=self.__debug)
     chessboard_calibration.mapping(
       chessboard_img=frame,
       fix_rotate=True,
