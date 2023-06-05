@@ -61,7 +61,7 @@ Some configurations are necessary to run the project:
   > 
   > **NOTE**
   >
-  > Keep this value unchanged if you just want to run the example project
+  > Skip this section if you just want to run the example project
   >
 
   In `src/.env` you must specify a camera source, you can do this by setting the `CAM_ADDRESS` parameter. Valid options are:
