@@ -37,11 +37,11 @@ We use the `Darknet` framework to train the `Yolov4` neural network to detect th
 
 Some configurations are necessary to run the project:
 
-1. [Get YOLO weights file](#get-yolo-weights-file)
-1. [Configure the camera](#configure-the-camera)
-1. [Virtual environment](#virtual-environment)
-1. [Board mapping](#board-mapping)
-1. [Start](#start)
+1. [Get YOLO weights file](#1-get-yolo-weights-file)
+1. [Configure the camera](#2-configure-the-camera)
+1. [Virtual environment](#3-virtual-environment)
+1. [Board mapping](#4-board-mapping)
+1. [Start](#5-start)
 
 <details>
   <summary>
