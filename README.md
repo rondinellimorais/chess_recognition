@@ -35,35 +35,118 @@ We use the `Darknet` framework to train the `Yolov4` neural network to detect th
 
 # Get started
 
-Before cloning this repo it depends on the installed `git lfs`
+Some configurations are necessary to run the project:
 
-```
-brew install git-lfs
-```
+1. [Get YOLO weights file](#1-get-yolo-weights-file)
+1. [Configure the camera](#2-configure-the-camera)
+1. [Virtual environment](#3-virtual-environment)
+1. [Board mapping](#4-board-mapping)
+1. [Start](#5-start)
 
-Create conda environment
+<details>
+  <summary>
 
-```bash
-# macos
-conda env create -f chess_recognition_macos.yml 
+  ## 1. Get YOLO weights file
+  </summary>
 
-# linux
-conda env create -f chess_recognition_linux.yml 
+  Get the file containing the YOLO neural network weights, you can download it at [yolov4_last.weights](https://drive.google.com/open?id=1aY6yIKVfnFlzLUU2jj9bumMCjMJRT9U1), after downloading move the file to `assets/dnn/yolov4_last.weights`
+</details>
 
-conda activate chess_recognition
-```
+<details>
+  <summary>
 
-## Mapping
+  ## 2. Configure the camera
+  </summary>
 
-```bash
-python3 src/main.py --mapping
-```
+  > 
+  > **NOTE**
+  >
+  > Skip this section if you just want to run the example project
+  >
 
-## Start
+  In `src/.env` you must specify a camera source, you can do this by setting the `CAM_ADDRESS` parameter. Valid options are:
 
-```bash
-python3 src/main.py --start
-```
+  | Option     | Example |
+  |:----------|:------------|
+  |IP | `http://192.168.0.111:4747/video` |
+  | device index | `0` (You can select the second camera by passing 1 and so on) |
+  | video file | `/path/file.mp4` |
+</details>
+
+<details>
+  <summary>
+
+  ## 3. Virtual environment
+  </summary>
+
+  Maybe you want to create a virtual environment using [miniconda](https://docs.conda.io/en/latest/miniconda.html) before run start.
+
+  >
+  > **Create Env with conda**
+  >
+  > ```conda create -n chess_recognition python=3.9 pip --yes```
+  
+  >
+  > **Activate env**
+  >
+  > ```conda activate chess_recognition```
+  >
+</details>
+
+<details>
+  <summary>
+
+  ## 4. Board mapping
+  </summary>
+
+  Before we can start the project we need to calibrate the board, you can do this using the command `python3 src/main.py --mapping`.
+
+  **NOTE:** _Run this command in the root of the project and not inside `src`_
+
+  If all goes well, you should see output similar to this one.
+
+  ```bash
+  frame resolution: (480, 480)
+  /path/chess_recognition/debug/1_raw.jpg
+  /path/chess_recognition/debug/2_biggest_cnt.jpg
+  /path/chess_recognition/debug/3_playable_area.jpg
+  /path/chess_recognition/debug/3.1_padding.jpg
+  /path/chess_recognition/debug/4_squares_corners.jpg
+  /path/chess_recognition/debug/5_mapping.jpg
+  Squares Average......: 3190.3125
+  Done!
+  ```
+
+  Then `chessboard-mapping.json` file must be created in the root of the project. You can look in the `debug` directory step by step calibration of the board, if you don't want to see those logs anymore set `DEBUG=0` in `.env`
+
+  Note that in `.env` we define the camera for an example video file:
+  
+  ```bash
+  # src/.env
+  CAM_ADDRESS=assets/videos/cam_example.mp4
+  ```
+
+  If you want to test with your own file or the your device camera, you must change this env and then calibrate your board. To calibrate your board, go to the `Game` class, `mapping` method, line `79` and change the parameters according to your needs:
+
+  | Parameter | Description |
+  |:----------|:------------|
+  | `add_padding` | A boolean indicate if image need a padding. Default is `False` |
+  | `fix_rotate` | A boolean indicate if image need a rotate. Default is `False` |
+  | `rotate_val` | The values of rotate if `fix_rotate` is `True`. Default is `-90` |
+  | `apply_kdilate` | A booelan indicate if image need expand your contours. Default is `True` |
+  | `smooth_ksize` | A tuple of Gaussian Blur ksize. Default is `(11, 11)` |
+</details>
+
+<details>
+  <summary>
+
+  ## 5. Start
+  </summary>
+
+  Now you are ready to start the game, go and run `python3 src/main.py --start`
+
+  **NOTE:** _Run this command in the root of the project and not inside `src`_
+</details>
 
 # Running
 

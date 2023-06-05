@@ -5,9 +5,10 @@ from utils import random_color
 class Debugable:
   def __init__(self, debug=False):
     self.debug = debug
-    self.default_path = os.path.join('/Users/rondinellimorais/Desktop/projetos/chess_recognition/debug')
-    if not os.path.exists(self.default_path):
-      os.mkdir(self.default_path)
+    if self.debug:
+      self.default_path = os.path.join(f"{os.environ['PWD']}/debug")
+      if not os.path.exists(self.default_path):
+        os.mkdir(self.default_path)
 
   def save(self, filename, img):
     if self.debug and len(img) > 0:
