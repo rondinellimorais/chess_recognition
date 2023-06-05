@@ -58,6 +58,12 @@ Some configurations are necessary to run the project:
   ## 2. Configure the camera
   </summary>
 
+  > 
+  > **NOTE**
+  >
+  > Keep this value unchanged if you just want to run the example project
+  >
+
   In `src/.env` you must specify a camera source, you can do this by setting the `CAM_ADDRESS` parameter. Valid options are:
 
   | Option     | Example |
@@ -65,12 +71,6 @@ Some configurations are necessary to run the project:
   |IP | `http://192.168.0.111:4747/video` |
   | device index | `0` (You can select the second camera by passing 1 and so on) |
   | video file | `/path/file.mp4` |
-
-  > 
-  > **NOTE**
-  >
-  > Keep this value unchanged (`cam_example.mp4` file) if you just want to run the example project
-  > 
 </details>
 
 <details>
