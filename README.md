@@ -100,7 +100,7 @@ Some configurations are necessary to run the project:
   ## 4. Install dependencies
   </summary>
 
-  Depois de criar e ativar o ambiente você deve instalar todas as dependências que o projeto precisa para funcionar. Execute o seguite comando no seu terminal:
+  After create and activate your environment you must install all the dependencies that the project needs to work. Run the following command in your terminal:
 
   ```bash
   pip install -r requirements.txt
