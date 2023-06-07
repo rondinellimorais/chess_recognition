@@ -40,7 +40,7 @@ Some configurations are necessary to run the project:
 1. [Get YOLO weights file](#1-get-yolo-weights-file)
 1. [Configure the camera](#2-configure-the-camera)
 1. [Virtual environment](#3-virtual-environment)
-1. [Install dependencies](#3-install-dependencies)
+1. [Install dependencies](#4-install-dependencies)
 1. [Board mapping](#5-board-mapping)
 1. [Start](#6-start)
 
