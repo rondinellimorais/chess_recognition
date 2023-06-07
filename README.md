@@ -40,8 +40,9 @@ Some configurations are necessary to run the project:
 1. [Get YOLO weights file](#1-get-yolo-weights-file)
 1. [Configure the camera](#2-configure-the-camera)
 1. [Virtual environment](#3-virtual-environment)
-1. [Board mapping](#4-board-mapping)
-1. [Start](#5-start)
+1. [Install dependencies](#4-install-dependencies)
+1. [Board mapping](#5-board-mapping)
+1. [Start](#6-start)
 
 <details>
   <summary>
@@ -96,7 +97,20 @@ Some configurations are necessary to run the project:
 <details>
   <summary>
 
-  ## 4. Board mapping
+  ## 4. Install dependencies
+  </summary>
+
+  After create and activate your environment you must install all the dependencies that the project needs to work. Run the following command in your terminal:
+
+  ```bash
+  pip install -r requirements.txt
+  ```
+</details>
+
+<details>
+  <summary>
+
+  ## 5. Board mapping
   </summary>
 
   Before we can start the project we need to calibrate the board, you can do this using the command `python3 src/main.py --mapping`.
@@ -140,7 +154,7 @@ Some configurations are necessary to run the project:
 <details>
   <summary>
 
-  ## 5. Start
+  ## 6. Start
   </summary>
 
   Now you are ready to start the game, go and run `python3 src/main.py --start`
