@@ -33,6 +33,15 @@ We use the `Darknet` framework to train the `Yolov4` neural network to detect th
 | 📷 Game Board Mapping | Find the playable area of the board | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/13r2HiJeB9G4eQP5a9WTQE_NyeiGQHnF6) |
 | 🖼️ Image Data Augmentation | Data augmentation techniques | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1NXRUnvztSCs7IljH8vXqEIIsFF0IPaTH) |
 
+# Database
+
+I created and annotated my own database using [LabelImg](https://github.com/heartexlabs/labelImg), below you can download them and see how I did it.
+
+| Title     | Description | Link |
+|:----------|:-----------|-----:|
+| 📦 Chess Piece v6 Database | Raw database without modifications | [Download](https://drive.google.com/file/d/1KvuBo4yffhk6qOmXtHssaKBnEPfiS2uH/view?usp=sharing) |
+| 📦 Chess Piece v6 Database Augmented | The above database with data augmentation | [Download](https://drive.google.com/file/d/1mS0MotZOeCf2-Th1vQEqNIrUY_MiW9hj/view?usp=sharing) |
+
 # Get started
 
 Some configurations are necessary to run the project:
@@ -99,6 +108,12 @@ Some configurations are necessary to run the project:
 
   ## 4. Install dependencies
   </summary>
+
+  >
+  > **NOTE: Apple Silicon M1**
+  >
+  > When Apple switched from Intel chips to internal Apple Silicon chips, they switched from x86 architecture to ARM64 architecture. If you have a Macbook with an M1 chip, you may experience problems installing certain packages. To work around this use the **Rosetta terminal**. 
+  >
 
   After create and activate your environment you must install all the dependencies that the project needs to work. Run the following command in your terminal:
 
